@@ -385,6 +385,10 @@ table.hist tr:hover td{background:var(--card-2);}
 .search:focus{outline:2px solid var(--atc); outline-offset:1px; border-color:var(--atc);}
 
 /* ---------- modals ---------- */
+/* layering: tree (300) < history/notes/pipeline (310) < record (320)
+   so drilling down stacks and closing walks back up */
+#ov-hist,#ov-notes,#ov-pipe{z-index:310;}
+#ov-record{z-index:320;}
 .overlay{
   position:fixed; inset:0; background:rgba(10,18,24,.55); z-index:300;
   display:none; align-items:center; justify-content:center; padding:20px;
@@ -442,6 +446,31 @@ table.hist tr:hover td{background:var(--card-2);}
 .mfield input[readonly]{background:var(--card-2); color:var(--ink-2);}
 .mfield textarea{resize:vertical; min-height:56px;}
 .mdiv{height:1px; background:var(--line); margin:14px 0 10px;}
+/* org hierarchy tree */
+.tnode{border-bottom:1px solid var(--line);}
+.tnode:last-child{border-bottom:none;}
+.trow{display:flex; align-items:center; gap:10px; padding:11px 18px;}
+.trow:hover{background:var(--card-2);}
+.trow .tx{
+  width:22px; height:22px; flex-shrink:0; border:1px solid var(--line-strong);
+  border-radius:6px; background:var(--card); color:var(--ink-2); cursor:pointer;
+  display:grid; place-items:center; font-size:10px; transition:transform .15s;
+}
+.trow .tx.open{transform:rotate(90deg);}
+.trow .tx.leaf{visibility:hidden;}
+.trow .avatar{width:30px; height:30px; font-size:11px;}
+.trow .id{flex:1; min-width:0;}
+.trow .id .nm{font-weight:700; font-size:13px;}
+.trow .id .ti{font-size:11px; color:var(--ink-3);}
+.tkids{display:none;}
+.tkids.open{display:block;}
+.tsearch{
+  padding:10px 18px; border-bottom:1px solid var(--line); background:var(--card);
+  position:sticky; top:57px; z-index:1;
+}
+.trow .nm mark{background:var(--atc-wash); color:var(--atc-deep); border-radius:3px; padding:0 1px;}
+.tempty{padding:26px 18px; text-align:center; font-size:12.5px; color:var(--ink-3);}
+.tkids .trow{border-top:1px solid var(--line);}
 @media(max-width:560px){.mgrid{grid-template-columns:1fr;}}
 
 /* ---------- views ---------- */
@@ -691,6 +720,7 @@ table.hist tr:hover td{background:var(--card-2);}
                 <span class="ct">Team CVAs</span>
                 <span class="spacer"></span>
                 <span class="tag mut">Full subordinate tree</span>
+                <button class="btn ghost sm" onclick="openTree()">Org hierarchy →</button>
               </div>
               <div class="rows" id="teamrows">
                 <div class="row">
@@ -699,6 +729,7 @@ table.hist tr:hover td{background:var(--card-2);}
                   <div class="stage"><div class="sl">With reviewers</div>
                     <div class="mtrack"><i class="d"></i><i class="n"></i><i></i><i></i><i></i><i></i><i></i></div></div>
                   <div class="due"><b>Jul 22</b>anniversary</div>
+                  <button class="iconb" title="History" onclick="openHistory('af')">🕘</button>
                   <button class="iconb" title="Notes" onclick="openNotes('af')">🗒</button>
                   <span class="pill">4</span>
                 </div>
@@ -708,6 +739,7 @@ table.hist tr:hover td{background:var(--card-2);}
                   <div class="stage"><div class="sl">With HR</div>
                     <div class="mtrack"><i class="d"></i><i class="d"></i><i class="n"></i><i></i><i></i><i></i><i></i></div></div>
                   <div class="due"><b>Sep 26</b>anniversary</div>
+                  <button class="iconb" title="History" onclick="openHistory('br')">🕘</button>
                   <button class="iconb" title="Notes" onclick="openNotes('br')">🗒</button>
                   <span class="pill">2</span>
                 </div>
@@ -717,6 +749,7 @@ table.hist tr:hover td{background:var(--card-2);}
                   <div class="stage"><div class="sl">Not started</div>
                     <div class="mtrack"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
                   <div class="due"><b>Feb 23</b>anniversary</div>
+                  <button class="iconb" title="History" onclick="openHistory('bo')">🕘</button>
                   <button class="iconb" title="Notes" onclick="openNotes('bo')">🗒</button>
                   <span class="pill">1</span>
                 </div>
@@ -726,6 +759,7 @@ table.hist tr:hover td{background:var(--card-2);}
                   <div class="stage"><div class="sl">Complete</div>
                     <div class="mtrack"><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i><i class="d"></i></div></div>
                   <div class="due"><b>Oct 15</b>anniversary</div>
+                  <button class="iconb" title="History" onclick="openHistory('ct')">🕘</button>
                   <button class="iconb" title="Notes" onclick="openNotes('ct')">🗒</button>
                   <span class="pill">0</span>
                 </div>
@@ -1039,6 +1073,24 @@ table.hist tr:hover td{background:var(--card-2);}
   </div>
 </div>
 
+<!-- Org hierarchy: subordinate tree with drill-in to history -->
+<div class="overlay" id="ov-tree" onclick="closeM('ov-tree')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:600px;">
+    <div class="mhead">
+      <div>
+        <div class="mt">Org hierarchy — your subordinate tree</div>
+        <div class="ms">Transitive reports · tap 🕘 for past CVAs &amp; PPMs, 🗒 for your notes</div>
+      </div>
+      <button class="mclose" onclick="closeM('ov-tree')">✕</button>
+    </div>
+    <div class="tsearch">
+      <input class="search" id="treesearch" placeholder="Search your tree — name or title…" oninput="filterTree(this.value)">
+    </div>
+    <div id="tree-body"></div>
+    <div class="mfoot"><button class="btn sm" onclick="closeM('ov-tree')">Close</button></div>
+  </div>
+</div>
+
 <!-- Pipeline stage detail -->
 <div class="overlay" id="ov-pipe" onclick="closeM('ov-pipe')">
   <div class="modal" onclick="event.stopPropagation()">
@@ -1233,6 +1285,7 @@ const HIST = {
   br:[
     {type:'CVA', date:'Sep 26, 2025', pri:'S. Davis', sec:'J. Latiolais', hr:'Meg Johnson', exec:'VP of Operations',
      cv:['+','+','+','+','+'], gwc:['+','+','±']},
+    {type:'PPM', date:'Jun 3, 2025', pri:'S. Davis'},
   ],
   bo:[
     {type:'CVA', date:'Feb 23, 2026', pri:'L. McKenzie', sec:'J. Latiolais', hr:'Meg Johnson', exec:'CEO',
@@ -1241,6 +1294,7 @@ const HIST = {
   ct:[
     {type:'CVA', date:'Oct 15, 2025', pri:'P. Parks', sec:'J. Latiolais', hr:'Shannan Williams', exec:'CEO',
      cv:['+','+','+','+','+'], gwc:['+','+','+']},
+    {type:'PPM', date:'Mar 3, 2025', pri:'P. Parks'},
   ],
   cs:[
     {type:'CVA', date:'Jul 1, 2025', pri:'J. Latiolais', sec:'CEO', hr:'Meg Johnson', exec:'CEO',
@@ -1333,7 +1387,7 @@ function openHistory(key){
     `<tr><td><span class="tag ${r.type==='CVA'?'atc':'ppm'}">${r.type}</span></td>`+
     `<td>${r.date}</td><td>${r.pri}</td>`+
     `<td style="text-align:right; white-space:nowrap;">`+
-    `<button class="btn ghost sm" onclick="closeM('ov-hist');openRecord('${key}',${i})">View →</button> `+
+    `<button class="btn ghost sm" onclick="openRecord('${key}',${i})">View →</button> `+
     `<button class="btn sm">⤓ PDF</button></td></tr>`
   ).join('') : '<tr><td colspan="4" style="color:var(--ink-3); text-align:center; padding:20px;">No completed assessments yet.</td></tr>';
   openM('ov-hist');
@@ -1362,6 +1416,80 @@ function openPipeline(key){
     `<button class="btn ghost sm">Open →</button></div>`
   ).join('') + (d.more?`<div style="padding:10px 18px; font-size:12px; color:var(--ink-3);">…and ${d.more} more</div>`:'');
   openM('ov-pipe');
+}
+
+/* org hierarchy tree
+   Renders only for managers with at least one sub-manager in
+   their chain; children come from Graph transitiveReports. */
+function hl(text){
+  if(!hlQuery) return text;
+  const i = text.toLowerCase().indexOf(hlQuery);
+  if(i < 0) return text;
+  return text.slice(0,i)+'<mark>'+text.slice(i,i+hlQuery.length)+'</mark>'+text.slice(i+hlQuery.length);
+}
+const TREE = [
+  {k:'ct', notes:0, kids:[
+    {k:'az', notes:0, kids:[]},
+    {k:'bo', notes:1, kids:[]},
+  ]},
+  {k:'af', notes:4, kids:[]},
+  {k:'br', notes:2, kids:[]},
+];
+
+function treeRow(node, depth){
+  const e = EMP[node.k];
+  const hasKids = node.kids.length > 0;
+  const initials = e.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return `<div class="tnode">
+    <div class="trow" style="padding-left:${18 + depth*26}px;">
+      <button class="tx ${hasKids?'':'leaf'}" id="tx-${node.k}" onclick="toggleTNode('${node.k}')">▶</button>
+      <div class="avatar">${initials}</div>
+      <div class="id"><div class="nm">${hl(e.name)}</div><div class="ti">${hl(e.title)}</div></div>
+      <button class="iconb" title="Past CVAs & PPMs" onclick="openHistory('${node.k}')">🕘</button>
+      <button class="iconb" title="Your notes" onclick="openNotes('${node.k}')">🗒</button>
+      <span class="pill">${node.notes}</span>
+    </div>
+    ${hasKids ? `<div class="tkids" id="tk-${node.k}">${node.kids.map(c=>treeRow(c, depth+1)).join('')}</div>` : ''}
+  </div>`;
+}
+function openTree(){
+  document.getElementById('treesearch').value = '';
+  hlQuery = '';
+  renderTree(TREE, false);
+  openM('ov-tree');
+}
+function renderTree(nodes, expandAll){
+  const body = document.getElementById('tree-body');
+  body.innerHTML = nodes.length
+    ? nodes.map(n=>treeRow(n,0)).join('')
+    : '<div class="tempty">No one in your tree matches that search.</div>';
+  if(expandAll){
+    body.querySelectorAll('.tkids').forEach(k=>k.classList.add('open'));
+    body.querySelectorAll('.tx:not(.leaf)').forEach(x=>x.classList.add('open'));
+  }
+}
+function toggleTNode(k){
+  document.getElementById('tk-'+k).classList.toggle('open');
+  document.getElementById('tx-'+k).classList.toggle('open');
+}
+/* keep a node if it matches, or if any descendant matches —
+   ancestors of a match stay visible so chain context is preserved */
+function pruneTree(nodes, q){
+  const out = [];
+  for(const n of nodes){
+    const e = EMP[n.k];
+    const hit = (e.name+' '+e.title).toLowerCase().includes(q);
+    const kids = pruneTree(n.kids, q);
+    if(hit || kids.length) out.push({...n, kids: hit ? n.kids : kids});
+  }
+  return out;
+}
+let hlQuery = '';
+function filterTree(q){
+  q = q.trim().toLowerCase();
+  hlQuery = q;
+  if(!q){ renderTree(TREE, false); return; }
+  renderTree(pruneTree(TREE, q), true);
 }
 
 /* assign & start */
