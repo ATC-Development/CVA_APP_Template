@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC PPM · Form Screens Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ATC PPM FORM SCREENS · desktop prototype
+   Design tokens shared with CVA_Dashboard / CVA_Form_Screens
+   ============================================================ */
+:root{
+  --paper:#e9edf0;
+  --card:#ffffff;
+  --card-2:#f5f7f9;
+  --ink:#16232e;
+  --ink-2:#4d5d6b;
+  --ink-3:#8b99a5;
+  --line:rgba(22,35,46,.12);
+  --line-strong:rgba(22,35,46,.22);
+
+  --atc:#2a97d4;
+  --atc-deep:#12639b;
+  --atc-wash:#e8f4fb;
+
+  --ok:#2e7d4f;   --ok-wash:#e8f4ec;
+  --warn:#b06a1a; --warn-wash:#fbf1e2;
+  --alert:#bf3a2b;--alert-wash:#fbeae7;
+  --ai:#6d4fa1;   --ai-wash:#f1ecf9;
+  --ppm:#0e7c86;  --ppm-wash:#e5f4f5;
+
+  --r:12px; --rs:7px;
+  --wsw:340px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --paper:#141a1f; --card:#1e262d; --card-2:#242e36;
+    --ink:#e7edf2; --ink-2:#9fb0bd; --ink-3:#657683;
+    --line:rgba(231,237,242,.10); --line-strong:rgba(231,237,242,.22);
+    --atc:#4db1e8; --atc-deep:#a5d8f5; --atc-wash:#0e2c40;
+    --ok:#5cba8a; --ok-wash:#122b1e;
+    --warn:#e0a054; --warn-wash:#33230d;
+    --alert:#e57a6d; --alert-wash:#361412;
+    --ai:#a98fd6; --ai-wash:#241a36;
+    --ppm:#4cbac3; --ppm-wash:#0c2b2e;
+  }
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font-family:var(--font); background:var(--paper); color:var(--ink);
+  font-size:14px; -webkit-font-smoothing:antialiased;
+}
+button{font-family:var(--font);}
+textarea,input{font-family:var(--font); color:var(--ink);}
+svg{display:block;}
+
+/* ---------- top chrome ---------- */
+.topbar{
+  display:flex; align-items:center; gap:18px; padding:10px 18px;
+  background:var(--ink); color:#dfe8ee; position:sticky; top:0; z-index:60;
+}
+@media(prefers-color-scheme:dark){ .topbar{background:#0d1319;} }
+.topbar .logo{display:flex; align-items:center; gap:10px;}
+.topbar .logo .mark{width:26px;height:26px;border-radius:6px;background:var(--ppm);display:grid;place-items:center;font-weight:900;color:#fff;font-size:12px;}
+.topbar .logo .t{font-weight:800; font-size:14px; letter-spacing:.02em;}
+.topbar .logo .t small{display:block;font-weight:600;font-size:10px;color:#9fb0bd;letter-spacing:.14em;text-transform:uppercase;}
+.modes{display:flex; gap:4px; flex-wrap:wrap;}
+.modes button{
+  border:1px solid rgba(255,255,255,.14); background:transparent; color:#c4d2dc;
+  padding:6px 11px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer;
+  letter-spacing:.02em;
+}
+.modes button .k{opacity:.55; font-weight:800; margin-right:5px;}
+.modes button.on{background:var(--ppm); border-color:var(--ppm); color:#fff;}
+.modes button:hover:not(.on){background:rgba(255,255,255,.08);}
+.proto{margin-left:auto; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7d8f9d; font-weight:700;}
+
+/* ---------- employee header + stage track ---------- */
+.emphead{
+  display:flex; align-items:center; gap:16px; padding:12px 22px;
+  background:var(--card); border-bottom:1px solid var(--line);
+}
+.emphead .av{width:40px;height:40px;border-radius:50%;background:var(--ppm-wash);color:var(--ppm);display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0;}
+.emphead .who .nm{font-weight:800; font-size:16px; font-variation-settings:'wdth' 110;}
+.emphead .who .ti{font-size:12px; color:var(--ink-2);}
+.emphead .mode-desc{font-size:12px; color:var(--ink-2); border-left:1px solid var(--line); padding-left:16px; max-width:340px;}
+.emphead .mode-desc b{color:var(--ink);}
+.stagetrack{margin-left:auto; display:flex; align-items:flex-start; gap:0;}
+.tstep{display:flex; flex-direction:column; align-items:center; width:74px; position:relative;}
+.tstep .dot{width:14px;height:14px;border-radius:50%;background:var(--card-2);border:2px solid var(--line-strong);z-index:1;}
+.tstep.done .dot{background:var(--ok);border-color:var(--ok);}
+.tstep.now .dot{background:var(--ppm);border-color:var(--ppm);box-shadow:0 0 0 4px var(--ppm-wash);}
+.tstep:not(:first-child)::before{
+  content:''; position:absolute; top:6px; right:50%; width:100%; height:2px; background:var(--line);
+}
+.tstep.done:not(:first-child)::before,.tstep.now:not(:first-child)::before{background:var(--ok);}
+.tstep .tl{font-size:8.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3); margin-top:5px; text-align:center; line-height:1.25;}
+.tstep.now .tl{color:var(--ppm);}
+.tstep.done .tl{color:var(--ink-2);}
+.headacts{display:flex; gap:8px; margin-left:18px;}
+.btn{
+  border:1px solid var(--line-strong); border-radius:9px; padding:8px 14px;
+  background:var(--card); color:var(--ink); font-size:12.5px; font-weight:700; cursor:pointer;
+}
+.btn:hover{border-color:var(--ppm);}
+.btn.pri{background:var(--ppm); border-color:var(--ppm); color:#fff;}
+.btn.pri:hover{filter:brightness(1.08);}
+.btn.sm{padding:5px 10px; font-size:11.5px; border-radius:7px;}
+.btn.ghost{background:transparent;}
+.savestate{font-size:11.5px; color:var(--ok); font-weight:700; display:flex; align-items:center; gap:5px;}
+.savestate::before{content:'✓';}
+
+/* ---------- mode sections ---------- */
+.mode{display:none;}
+.mode.on{display:block;}
+.mode-note{
+  margin:14px 22px 0; padding:9px 14px; border-radius:var(--rs);
+  background:var(--ppm-wash); color:var(--ppm); font-size:12px; font-weight:600;
+  display:flex; gap:8px; align-items:center;
+}
+.mode-note svg{flex-shrink:0;}
+
+/* ============================================================
+   WORKSPACE (docked widgets) — shared by modes 1 & 2
+   ============================================================ */
+.workspace{
+  display:grid; grid-template-columns:1fr 8px var(--wsw);
+  gap:0; padding:14px 22px 8px; align-items:start;
+  min-height:calc(100vh - 210px);
+}
+.zone{min-width:0;}
+.zone.droptarget{outline:2px dashed var(--ppm); outline-offset:4px; border-radius:var(--r);}
+.zone.rstack{display:flex; flex-direction:column; gap:12px;}
+.seam{cursor:col-resize; position:relative;}
+.seam::after{content:''; position:absolute; left:3px; top:0; bottom:0; width:2px; background:var(--line); border-radius:2px;}
+.seam:hover::after{background:var(--ppm);}
+
+.widget{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:0 1px 2px rgba(22,35,46,.05); overflow:hidden; display:flex; flex-direction:column;
+}
+.widget .whead{
+  display:flex; align-items:center; gap:8px; padding:9px 12px;
+  border-bottom:1px solid var(--line); background:var(--card-2); cursor:grab; user-select:none;
+}
+.widget .whead:active{cursor:grabbing;}
+.widget .whead .grip{color:var(--ink-3);}
+.widget .whead .wt{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2);}
+.widget .whead .wsub{font-size:10.5px; color:var(--ink-3); font-weight:600;}
+.widget .whead .wbtns{margin-left:auto; display:flex; gap:4px;}
+.wbtn{width:22px;height:22px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;font-size:11px;font-weight:800;line-height:1;}
+.wbtn:hover{border-color:var(--ppm); color:var(--ppm);}
+.widget .wbody{overflow-y:auto; flex:1;}
+.zone.rstack .widget .wbody{max-height:300px;}
+.zone.mainz .widget .wbody{max-height:calc(100vh - 300px);}
+.widget.dragging{opacity:.45;}
+
+/* minimized tray */
+.tray{display:flex; gap:8px; align-items:center; padding:8px 22px 16px; flex-wrap:wrap;}
+.tray .traylabel{font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);}
+.traypill{
+  display:flex; align-items:center; gap:7px; padding:6px 12px; border-radius:99px;
+  border:1px solid var(--line-strong); background:var(--card); font-size:11.5px; font-weight:700;
+  color:var(--ink-2); cursor:pointer;
+}
+.traypill:hover{border-color:var(--ppm); color:var(--ppm);}
+.traypill .up{font-weight:900;}
+
+/* ---------- PPM form ---------- */
+.secdiv{
+  padding:7px 16px; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3); background:var(--card-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.qcard{padding:13px 16px 15px; border-bottom:1px solid var(--line);}
+.qcard:last-child{border-bottom:none;}
+.qcard .qrow{display:flex; align-items:flex-start; gap:10px;}
+.qcard .qk{font-size:11px; font-weight:800; color:var(--ppm); width:18px; padding-top:1px;}
+.qcard .qtext{font-weight:700; font-size:13.5px; flex:1; line-height:1.4;}
+.qcard textarea{
+  width:100%; margin-top:9px; min-height:74px; resize:vertical;
+  border:1px solid var(--line-strong); border-radius:var(--rs); padding:9px 11px;
+  font-size:13px; line-height:1.5; background:var(--card);
+}
+.qcard textarea:focus{outline:2px solid var(--ppm); outline-offset:-1px; border-color:transparent;}
+.qcard .roanswer{
+  margin-top:9px; font-size:13px; line-height:1.55; color:var(--ink-2);
+  background:var(--card-2); border-radius:var(--rs); padding:9px 11px;
+}
+
+/* prior-plan chip block (pairs A↔D, B↔E, C↔F) */
+.priorplan{
+  margin:9px 0 0; border:1px dashed var(--line-strong); border-radius:var(--rs);
+  background:var(--card-2); padding:8px 11px;
+}
+.priorplan .pph{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ppm); display:flex; gap:6px; align-items:center;}
+.priorplan .ppline{display:flex; gap:7px; margin-top:6px; align-items:baseline;}
+.priorplan .who{font-size:10px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); width:82px; flex-shrink:0;}
+.priorplan .items{display:flex; flex-wrap:wrap; gap:4px;}
+.gchip{
+  font-size:11.5px; font-weight:600; padding:2px 9px; border-radius:99px;
+  background:var(--card); border:1px solid var(--line); color:var(--ink-2);
+}
+
+/* goal item editor (D–F) */
+.goallist{margin-top:9px; display:flex; flex-direction:column; gap:6px;}
+.goalitem{
+  display:flex; align-items:center; gap:9px; padding:7px 11px;
+  border:1px solid var(--line); border-radius:var(--rs); background:var(--card-2); font-size:13px;
+}
+.goalitem .gd{color:var(--ppm); font-weight:900; font-size:11px;}
+.goalitem .gt{flex:1; line-height:1.4;}
+.goalitem .gx{border:none; background:transparent; color:var(--ink-3); cursor:pointer; font-size:13px; font-weight:800; padding:0 3px;}
+.goalitem .gx:hover{color:var(--alert);}
+.goaladd{display:flex; gap:7px; margin-top:7px;}
+.goaladd input{
+  flex:1; border:1px solid var(--line-strong); border-radius:var(--rs); padding:7px 11px;
+  font-size:12.5px; background:var(--card);
+}
+.goaladd input:focus{outline:2px solid var(--ppm); outline-offset:-1px;}
+
+/* read-only goal chips (merged / reference) */
+.gchips-ro{display:flex; flex-wrap:wrap; gap:5px; margin-top:8px;}
+.gchips-ro .gchip{font-size:12px; padding:4px 11px;}
+
+/* ---------- reference widgets ---------- */
+.refhead{padding:10px 14px; font-size:11.5px; color:var(--ink-2); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px;}
+.refhead b{color:var(--ink);}
+.refhead .tag{font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:99px; background:var(--ok-wash); color:var(--ok);}
+.refhead .tag.ppmtag{background:var(--ppm-wash); color:var(--ppm);}
+.refq{padding:11px 14px; border-bottom:1px solid var(--line);}
+.refq .rh{display:flex; gap:8px; align-items:baseline;}
+.refq .rh .qk{font-size:11px; font-weight:800; color:var(--ppm); width:14px;}
+.refq .rh .qname{font-size:12px; font-weight:700; flex:1; line-height:1.35;}
+.refq .side{display:flex; gap:7px; margin-top:6px; align-items:baseline;}
+.refq .side .who{font-size:9.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); width:72px; flex-shrink:0;}
+.refq .side .tx{font-size:12px; color:var(--ink-2); line-height:1.5; flex:1;}
+.refcat{padding:11px 14px; border-bottom:1px solid var(--line);}
+.refcat .rh{display:flex; align-items:center; gap:8px;}
+.refcat .rh .cn{font-size:11px;font-weight:800;color:var(--ink-3);width:16px;}
+.refcat .rh .cname{font-size:12px; font-weight:700; flex:1;}
+.refcat .rt{font-size:12px; color:var(--ink-2); line-height:1.5; margin-top:5px;}
+.ratepill{min-width:34px; padding:3px 8px; border-radius:7px; font-size:12px; font-weight:800; text-align:center; display:inline-block;}
+.ratepill.rp{background:var(--ok-wash); color:var(--ok);}
+.ratepill.rpm{background:var(--warn-wash); color:var(--warn);}
+.ratepill.rm{background:var(--alert-wash); color:var(--alert);}
+.ratepill.rn{background:var(--card-2); color:var(--ink-3);}
+
+/* notes + AI widget */
+.noteitem{padding:11px 14px; border-bottom:1px solid var(--line);}
+.noteitem .nd{font-size:10.5px; color:var(--ink-3); font-weight:700; display:flex; gap:8px; align-items:center;}
+.noteitem .nt{font-size:12.5px; line-height:1.5; margin-top:4px; color:var(--ink);}
+.noteitem .nacts{margin-top:7px;}
+.aibtn{
+  border:1px solid var(--ai); color:var(--ai); background:transparent; border-radius:7px;
+  padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;
+}
+.aibtn:hover{background:var(--ai-wash);}
+.aicard{margin-top:8px; border:1px solid var(--ai); border-radius:var(--rs); background:var(--ai-wash); padding:10px 12px;}
+.aicard .ah{font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ai); display:flex; align-items:center; gap:6px;}
+.aicard .amap{font-size:11.5px; font-weight:700; margin-top:5px;}
+.aicard .amap b{color:var(--ai);}
+.aicard .atext{font-size:12.5px; line-height:1.5; margin-top:5px; font-style:italic;}
+.aicard .aacts{display:flex; gap:6px; margin-top:8px;}
+.aicard .abtn{border:none; border-radius:7px; padding:5px 11px; font-size:11px; font-weight:700; cursor:pointer;}
+.aicard .abtn.use{background:var(--ai); color:#fff;}
+.aicard .abtn.dis{background:transparent; color:var(--ink-2); border:1px solid var(--line-strong);}
+.aidisclaim{padding:8px 14px; font-size:10.5px; color:var(--ink-3); line-height:1.45; background:var(--card-2);}
+
+/* ============================================================
+   MODE 3 · READY TO MEET
+   ============================================================ */
+.centerwrap{max-width:960px; margin:0 auto; padding:14px 22px 40px;}
+.panelcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
+.panelcard .pchead{
+  display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); background:var(--card-2);
+}
+.panelcard .pchead .t{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2);}
+.viewtoggle{display:flex; gap:4px; margin-left:auto;}
+.viewtoggle button{
+  border:1px solid var(--line-strong); background:var(--card); color:var(--ink-2);
+  padding:4px 11px; font-size:11px; font-weight:700; cursor:pointer; border-radius:7px;
+}
+.viewtoggle button.on{background:var(--ppm); border-color:var(--ppm); color:#fff;}
+.siderow{
+  display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line);
+}
+.siderow .sav{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;flex-shrink:0;}
+.siderow .sav.emp{background:var(--ppm-wash);color:var(--ppm);}
+.siderow .sav.sup{background:var(--atc-wash);color:var(--atc-deep);}
+.siderow .swho .sn{font-weight:700; font-size:13.5px;}
+.siderow .swho .sr{font-size:11px; color:var(--ink-3);}
+.siderow .sst{margin-left:auto; font-size:11.5px; font-weight:700; display:flex; align-items:center; gap:7px;}
+.siderow .sst.ok{color:var(--ok);}
+.siderow .sst.locked{color:var(--ink-3);}
+.meetband{padding:16px 18px; font-size:13px; line-height:1.55; color:var(--ink-2);}
+.meetband b{color:var(--ink);}
+.releaserow{padding:0 18px 18px; display:flex; gap:10px; align-items:center;}
+.releaserow .hint{font-size:11.5px; color:var(--ink-3);}
+
+/* ============================================================
+   MODES 4 & 5 · MERGED / COMPLETE
+   ============================================================ */
+.mq{border-bottom:1px solid var(--line);}
+.mq .mqh{display:flex; gap:10px; align-items:baseline; padding:12px 16px 0;}
+.mq .mqh .qk{font-size:11px; font-weight:800; color:var(--ppm); width:16px;}
+.mq .mqh .qtext{font-weight:700; font-size:13.5px; flex:1; line-height:1.4;}
+.mq .mqh .planflag{font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ppm); background:var(--ppm-wash); padding:2px 8px; border-radius:99px; white-space:nowrap;}
+.mgrid{display:grid; grid-template-columns:1fr 1fr; gap:0; padding:9px 16px 14px;}
+.mpane{padding:10px 12px; min-width:0;}
+.mpane:first-child{border-right:1px solid var(--line);}
+.mpane .ph{font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px;}
+.mpane .ptext{font-size:12.5px; line-height:1.55; color:var(--ink-2);}
+
+/* signatures */
+.signrow{display:flex; flex-wrap:wrap; gap:10px; padding:14px 16px;}
+.sigcard{
+  flex:1; min-width:200px; border:1px solid var(--line); border-radius:var(--rs); padding:10px 12px; background:var(--card-2);
+}
+.sigcard .sl{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.sigcard .sig{font-family:'Segoe Script','Bradley Hand',cursive; font-size:17px; margin-top:5px; color:var(--ink);}
+.sigcard .sd{font-size:10.5px; color:var(--ink-3); margin-top:2px;}
+.sigcard.pending{border-style:dashed;}
+.sigcard.pending .sig{color:var(--ink-3); font-family:var(--font); font-size:12px; font-weight:600;}
+.hrband{
+  margin:0 16px 16px; padding:9px 13px; border-radius:var(--rs); font-size:12px; font-weight:600;
+  background:var(--ok-wash); color:var(--ok); display:flex; gap:8px; align-items:center;
+}
+
+/* dialog + toast */
+.overlay{position:fixed; inset:0; background:rgba(22,35,46,.45); display:none; z-index:100; align-items:center; justify-content:center;}
+.overlay.on{display:flex;}
+.dialog{background:var(--card); border-radius:var(--r); width:440px; max-width:92vw; padding:22px; box-shadow:0 18px 50px rgba(0,0,0,.3);}
+.dialog h3{font-size:16px; font-weight:800; font-variation-settings:'wdth' 110;}
+.dialog p{font-size:12.5px; color:var(--ink-2); margin-top:6px; line-height:1.5;}
+.dialog .sigbox{
+  margin-top:14px; border:1px dashed var(--line-strong); border-radius:var(--rs); height:74px;
+  display:grid; place-items:center; font-family:'Segoe Script','Bradley Hand',cursive; font-size:22px; background:var(--card-2);
+}
+.dialog .dacts{display:flex; gap:8px; justify-content:flex-end; margin-top:16px;}
+.toast{
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--ink); color:#fff; padding:10px 18px; border-radius:99px; font-size:12.5px; font-weight:700;
+  opacity:0; transition:all .25s; z-index:120; pointer-events:none;
+}
+@media(prefers-color-scheme:dark){ .toast{background:var(--ppm);} }
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+button:focus-visible,textarea:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ppm); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP CHROME ================= -->
+<div class="topbar">
+  <div class="logo">
+    <div class="mark">A</div>
+    <div class="t">PPM Form Screens<small>ATC Development · Prototype</small></div>
+  </div>
+  <div class="modes" id="modeTabs">
+    <button data-m="1" class="on"><span class="k">1</span>Employee · Drafting</button>
+    <button data-m="2"><span class="k">2</span>Supervisor · Drafting</button>
+    <button data-m="3"><span class="k">3</span>Ready to Meet</button>
+    <button data-m="4"><span class="k">4</span>Merged Record</button>
+    <button data-m="5"><span class="k">5</span>Complete · HR Visible</button>
+  </div>
+  <div class="proto">Prototype · sample data</div>
+</div>
+
+<!-- ================= EMPLOYEE HEADER ================= -->
+<div class="emphead">
+  <div class="av">CM</div>
+  <div class="who">
+    <div class="nm">Courtney Murrah</div>
+    <div class="ti">Leasing Consultant · Riverbend · PPM · Aug 2026</div>
+  </div>
+  <div class="mode-desc" id="modeDesc"></div>
+  <div class="stagetrack" id="stageTrack"></div>
+  <div class="headacts" id="headActs"></div>
+</div>
+
+<!-- ================= MODE 1 · EMPLOYEE DRAFTING ================= -->
+<section class="mode on" id="m1">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Independent drafting in effect — your supervisor cannot see this side until the merge is released after your meeting. Drag widget headers between zones · minimize to the tray.
+  </div>
+  <div class="workspace">
+    <div class="zone mainz" id="mainZone1"></div>
+    <div class="seam"></div>
+    <div class="zone rstack" id="rightStack1"></div>
+  </div>
+  <div class="tray" id="tray1"><span class="traylabel">Tray</span></div>
+</section>
+
+<!-- ================= MODE 2 · SUPERVISOR DRAFTING ================= -->
+<section class="mode" id="m2">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Independent drafting in effect — Courtney cannot see this side until you release the merge. Your notes are private to you and are never shown to the employee.
+  </div>
+  <div class="workspace">
+    <div class="zone mainz" id="mainZone2"></div>
+    <div class="seam"></div>
+    <div class="zone rstack" id="rightStack2"></div>
+  </div>
+  <div class="tray" id="tray2"><span class="traylabel">Tray</span></div>
+</section>
+
+<!-- ================= MODE 3 · READY TO MEET ================= -->
+<section class="mode" id="m3">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/><circle cx="9" cy="7" r="4"/></svg>
+    Both sides are submitted and locked. Meet in person, then the supervisor releases the merge — releasing reveals both sides to both parties.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard">
+      <div class="pchead"><span class="t">PPM · Aug 2026 · status</span>
+        <span class="viewtoggle" id="vt3">
+          <button class="on" onclick="setView3('sup',this)">Viewing as Supervisor</button>
+          <button onclick="setView3('emp',this)">Viewing as Employee</button>
+        </span>
+      </div>
+      <div id="m3Body"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODE 4 · MERGED ================= -->
+<section class="mode" id="m4">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+    Merge released — both sides are now visible to both parties and locked. Signatures complete the PPM. Section 2 goals become the plan of record for the next cycle.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard" id="m4Card"></div>
+  </div>
+</section>
+
+<!-- ================= MODE 5 · COMPLETE ================= -->
+<section class="mode" id="m5">
+  <div class="mode-note" style="background:var(--ok-wash);color:var(--ok);">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>
+    Complete and locked read-only. HR visibility begins at this stage — HR has no view of a PPM at any earlier point in its lifecycle.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard" id="m5Card"></div>
+  </div>
+</section>
+
+<!-- ================= SIGN DIALOG ================= -->
+<div class="overlay" id="signOverlay">
+  <div class="dialog">
+    <h3 id="dlgTitle">Sign off on PPM</h3>
+    <p id="dlgDesc"></p>
+    <div class="sigbox" id="dlgSig">Courtney Murrah</div>
+    <div class="dacts">
+      <button class="btn ghost" onclick="closeDialog()">Cancel</button>
+      <button class="btn pri" onclick="applySig()">Apply signature</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   SAMPLE DATA
+   ============================================================ */
+const EMP={name:'Courtney Murrah', short:'Courtney', role:'Leasing Consultant'};
+const SUP={name:'Maria Gonzales', short:'Maria', role:'Property Manager · Riverbend'};
+
+/* Question meta — six questions from the paper form, verbatim.
+   A–C are narrative (past). D–F are goal-item lists (future).
+   pair: which prior-cycle future question frames this past question. */
+const QMETA=[
+ {k:'A',sec:'SECTION 1 · RELATING TO THE PAST PPM',q:'What actions have you taken? What accomplishment(s) are you most proud of?',pair:'D'},
+ {k:'B',sec:'SECTION 1 · RELATING TO THE PAST PPM',q:'What discoveries have you made? (Examples: How have you grown? What have you learned?)',pair:'E'},
+ {k:'C',sec:'SECTION 1 · RELATING TO THE PAST PPM',q:'What partnerships have you built? (This can be making new relationships or strengthening existing ones.)',pair:'F'},
+ {k:'D',sec:'SECTION 2 · RELATING TO THE FUTURE',q:'What is your main focus and/or primary goal(s)?',goal:true,kind:'Focus'},
+ {k:'E',sec:'SECTION 2 · RELATING TO THE FUTURE',q:'What new discoveries are you planning? What do you need to learn?',goal:true,kind:'Learning'},
+ {k:'F',sec:'SECTION 2 · RELATING TO THE FUTURE',q:'What new partnerships are you hoping to build? Who needs your help to grow?',goal:true,kind:'Partnership'},
+];
+
+/* Prior PPM · Aug 2025 — both sides. D–F stored as discrete goal items. */
+const PRIOR={
+ date:'Aug 2025',
+ A:{e:'Took over the tour calendar after Dana left and kept occupancy showings on schedule through the summer.',
+    s:'Courtney absorbed the tour calendar mid-crunch and kept showings fully covered.'},
+ B:{e:'Learned that most renewal hesitation is really a maintenance-history conversation — asking about open tickets first changed my close rate.',
+    s:'She figured out on her own that renewals are won or lost on service history, not price.'},
+ C:{e:'Built a good rhythm with the front office at Crestview for overflow referrals.',
+    s:'Strong referral relationship with Crestview; residents notice the coordination.'},
+ D:{e:['Take the lead on weekend tour scheduling','Hit a 90% renewal-contact rate'],
+    s:['Own the move-in file audit end to end','Take the lead on weekend tours']},
+ E:{e:['Learn the Yardi renewal workflow end to end'],
+    s:['Complete the fair-housing refresher','Learn the Yardi renewal workflow']},
+ F:{e:['Set up a standing turn-scheduling huddle with maintenance'],
+    s:['Partner with the maintenance lead on unit-turn timing']},
+};
+
+/* Current drafts — editable state. */
+const DRAFT={
+ emp:{
+  A:'I ran weekend tours solo for most of the spring and closed 11 leases in that window. Proudest of the renewal-contact rate — finished the cycle at 93%, ahead of the 90% goal.',
+  B:'The Yardi renewal workflow finally clicked once I shadowed the month-end close. I also learned I underestimate how long file audits take — I need to block real time for them.',
+  C:'The maintenance huddle happened — every Thursday now with Luis. Turn timing disputes basically disappeared. Also built a referral line with the Crestview office.',
+  D:['Take on renewals reporting for the property','Cross-train on Yardi lease setup'],
+  E:['Learn the monthly variance report process','Understand how turn costs are tracked'],
+  F:['Work more closely with the area accounting lead','Help onboard the new weekend leasing hire'],
+ },
+ sup:{
+  A:'Courtney carried the weekend tour load without backup for three months and beat her renewal-contact goal (93% against 90%). The Thursday maintenance huddle she set up is now how the whole property schedules turns.',
+  B:'She has grown from executing tasks to spotting process gaps — the huddle and the renewal-history approach were both her ideas. File audits remain slower than they should be; time-blocking would fix it.',
+  C:'Partnership with Luis (maintenance) is the strongest cross-team link on the property. Crestview referral line is producing steady overflow traffic.',
+  D:['Own renewals reporting with a monthly review checkpoint','Delegate weekend tour coverage to the new hire by Q1'],
+  E:['Learn variance reporting with the area accounting lead','Shadow one full month-end close'],
+  F:['Mentor the new weekend leasing hire','Build a working line to the area accounting lead'],
+ },
+};
+
+/* Courtney's last completed CVA (reference widget). */
+const LASTCVA=[
+ {i:1,sec:'CORE VALUES',n:'Customers are Valuable',r:'+',c:'Consistently warm with prospects and residents; two named survey mentions.'},
+ {i:2,sec:'CORE VALUES',n:'Work Should Enhance Life',r:'+',c:'Positive presence; covers gaps without complaint.'},
+ {i:3,sec:'CORE VALUES',n:'Be Professionals, Not Job Holders',r:'+/-',c:'Great initiative on tours and renewals; file-audit timeliness needs consistency.'},
+ {i:4,sec:'CORE VALUES',n:'We Must Work Together',r:'+',c:'The maintenance huddle is a model for the property.'},
+ {i:5,sec:'CORE VALUES',n:'Build Value',r:'+',c:'93% renewal-contact rate directly protected occupancy.'},
+ {i:6,sec:'GET IT — WANT IT — CAPACITY',n:'Get It',r:'+',c:'Understands the leasing engine end to end.'},
+ {i:7,sec:'GET IT — WANT IT — CAPACITY',n:'Want It',r:'+',c:'Asked about the renewals-reporting track unprompted.'},
+ {i:8,sec:'GET IT — WANT IT — CAPACITY',n:'Capacity To Do It',r:'+',c:'Handled peak season solo; no concerns.'},
+ {i:9,sec:'GENERAL',n:'General Comments / Next Steps',r:'',c:'Ready for reporting responsibility; pair with area accounting for a quarter.'},
+];
+
+/* Supervisor's cycle notes about Courtney (private). AI suggests a target question + phrasing only. */
+const SNOTES=[
+ {d:'Mar 07',t:'ran weekend tours solo again — 3rd weekend straight, closed 2 leases sat.',q:'A',
+  ai:'Independently covered weekend tours for three consecutive weekends, closing two leases in a single Saturday.'},
+ {d:'Apr 22',t:'thursday huddle w/ luis has basically killed the turn-date arguments. her idea, her follow-through.',q:'C',
+  ai:'Established and sustained a weekly turn-scheduling huddle with the maintenance lead, eliminating recurring turn-date conflicts.'},
+ {d:'Jun 10',t:'renewal contact tracker at 93% — she beat the 90 goal early.',q:'A',
+  ai:'Reached a 93% renewal-contact rate, exceeding the 90% goal ahead of schedule.'},
+ {d:'Jul 02',t:'move-in file audit late again. quality fine, timing not.',q:'B',
+  ai:'Move-in file audits continue to run past due; output quality is solid but time management on audits is the growth edge.'},
+];
+
+const STAGES=['Drafting','Submitted','Ready to Meet','Merged','Complete'];
+const MODEMETA={
+ 1:{stage:0,desc:'<b>Your side (Employee)</b> — draft independently. References: your last PPM (both sides) and your last CVA.',acts:[['Save',''],['Submit my side','pri']],save:true},
+ 2:{stage:0,desc:'<b>Your side (Supervisor)</b> — draft independently about Courtney. References: last PPM, last CVA, your cycle notes.',acts:[['Save',''],['Submit my side','pri']],save:true},
+ 3:{stage:2,desc:'<b>Ready to meet</b> — both sides in and locked. The supervisor releases the merge after the meeting.',acts:[]},
+ 4:{stage:3,desc:'<b>Merged</b> — released by the supervisor. Both parties sign to complete.',acts:[['Sign off on PPM','pri']]},
+ 5:{stage:5,desc:'<b>Complete</b> — locked. HR visibility begins at Complete; no earlier stage is visible to HR.',acts:[['PDF','ghost']]},
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function rcls(r){return r==='+'?'rp':r==='+/-'?'rpm':r==='-'?'rm':'rn';}
+function pill(r){return `<span class="ratepill ${rcls(r)}">${r||'—'}</span>`;}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);}
+function grip(){return `<svg class="grip" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>`;}
+function spark(){return `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.1 6.5L20 10l-5.9 1.5L12 18l-2.1-6.5L4 10l5.9-1.5z"/></svg>`;}
+function chips(arr){return arr.map(g=>`<span class="gchip">${esc(g)}</span>`).join('');}
+
+/* ============================================================
+   HEADER (per mode)
+   ============================================================ */
+function renderHeader(m){
+  const meta=MODEMETA[m];
+  $('#modeDesc').innerHTML=meta.desc;
+  $('#stageTrack').innerHTML=STAGES.map((s,i)=>{
+    const cls=i<meta.stage?'done':i===meta.stage?'now':'';
+    return `<div class="tstep ${cls}"><div class="dot"></div><div class="tl">${s}</div></div>`;
+  }).join('');
+  $('#headActs').innerHTML=(meta.save?'<span class="savestate">Saved</span>':'')+
+    meta.acts.map(([l,c])=>`<button class="btn ${c}" onclick="headAction('${l.replace(/'/g,"\\'")}',${m})">${l}</button>`).join('');
+}
+function headAction(label,m){
+  if(label==='Submit my side'){
+    openDialog('Submit your side',
+      m===1
+        ?'Submitting locks your answers. Your supervisor still cannot see them — both sides stay sealed until the merge is released after your meeting.'
+        :'Submitting locks your answers. Courtney cannot see them — both sides stay sealed until you release the merge after your meeting.',
+      m===1?EMP.name:SUP.name);
+    return;
+  }
+  if(label==='Sign off on PPM'){
+    openDialog('Sign off on PPM','Your signature confirms this PPM was discussed in your meeting. When both signatures are in, the PPM is Complete and becomes visible to HR.',EMP.name);
+    return;
+  }
+  if(label==='PDF'){toast('Archive PDF generated on demand (mock)');return;}
+  toast(label==='Save'?'Draft saved':'Done');
+}
+
+/* ============================================================
+   MODE SWITCHING
+   ============================================================ */
+document.querySelectorAll('#modeTabs button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#modeTabs button').forEach(x=>x.classList.toggle('on',x===b));
+    const m=+b.dataset.m;
+    document.querySelectorAll('.mode').forEach(s=>s.classList.remove('on'));
+    $('#m'+m).classList.add('on');
+    renderHeader(m);
+  };
+});
+
+/* ============================================================
+   FORM WIDGET (modes 1 & 2)
+   role: 'emp' | 'sup'
+   ============================================================ */
+function priorPlanBlock(pairK,role){
+  const p=PRIOR[pairK];
+  const youFirst=role==='emp'
+    ?[['You',p.e],[SUP.short+' (sup)',p.s]]
+    :[[EMP.short,p.e],['You (sup)',p.s]];
+  return `<div class="priorplan">
+    <div class="pph">Prior plan · ${PRIOR.date} PPM · (${pairK})</div>
+    ${youFirst.map(([who,items])=>`<div class="ppline"><span class="who">${who}</span><span class="items">${chips(items)}</span></div>`).join('')}
+  </div>`;
+}
+function renderFormWidget(role){
+  const d=DRAFT[role];
+  let html='',cursec='';
+  QMETA.forEach(q=>{
+    if(q.sec!==cursec){cursec=q.sec;html+=`<div class="secdiv">${cursec}</div>`;}
+    html+=`<div class="qcard">
+      <div class="qrow"><span class="qk">${q.k}</span><span class="qtext">${q.q}</span></div>`;
+    if(q.pair)html+=priorPlanBlock(q.pair,role);
+    if(q.goal){
+      html+=`<div class="goallist" id="gl-${role}-${q.k}">${renderGoalItems(role,q.k)}</div>
+      <div class="goaladd">
+        <input id="gi-${role}-${q.k}" placeholder="Add a ${q.kind.toLowerCase()} item — one goal per line" onkeydown="if(event.key==='Enter')addGoal('${role}','${q.k}')">
+        <button class="btn sm" onclick="addGoal('${role}','${q.k}')">+ Add</button>
+      </div>`;
+    }else{
+      html+=`<textarea id="ta-${role}-${q.k}" placeholder="${role==='emp'?'Your answer':'Your answer about '+EMP.short}">${esc(d[q.k])}</textarea>`;
+    }
+    html+=`</div>`;
+  });
+  const sub=role==='emp'?'My side · Employee · editing':'My side · Supervisor · editing';
+  return widgetShell('wForm'+role,'PPM Form',sub,html);
+}
+function renderGoalItems(role,k){
+  return DRAFT[role][k].map((g,i)=>`<div class="goalitem"><span class="gd">◆</span><span class="gt">${esc(g)}</span><button class="gx" title="Remove" onclick="rmGoal('${role}','${k}',${i})">✕</button></div>`).join('')
+    ||`<div style="font-size:12px;color:var(--ink-3);padding:2px 1px;">No items yet.</div>`;
+}
+function addGoal(role,k){
+  const inp=document.getElementById(`gi-${role}-${k}`);
+  const v=inp.value.trim();
+  if(!v){toast('Type a goal first');return;}
+  DRAFT[role][k].push(v); inp.value='';
+  document.getElementById(`gl-${role}-${k}`).innerHTML=renderGoalItems(role,k);
+  inp.focus();
+}
+function rmGoal(role,k,i){
+  DRAFT[role][k].splice(i,1);
+  document.getElementById(`gl-${role}-${k}`).innerHTML=renderGoalItems(role,k);
+}
+
+/* ============================================================
+   REFERENCE WIDGETS
+   ============================================================ */
+function widgetShell(id,title,sub,body){
+  return `<div class="widget" id="${id}" data-title="${title}">
+    <div class="whead" draggable="true">${grip()}<span class="wt">${title}</span><span class="wsub">${sub}</span>
+      <span class="wbtns">
+        <button class="wbtn" title="Minimize" onclick="minimizeWidget('${id}')">–</button>
+        <button class="wbtn" title="Send to main zone" onclick="toMain('${id}')">⤢</button>
+      </span>
+    </div>
+    <div class="wbody">${body}</div>
+  </div>`;
+}
+function renderLastPpm(role,suffix){
+  let html=`<div class="refhead"><b>PPM · ${PRIOR.date}</b> · merged record <span class="tag ppmtag">Both sides</span></div>`;
+  QMETA.forEach(q=>{
+    const p=PRIOR[q.k];
+    const eBody=q.goal?`<span class="items">${chips(p.e)}</span>`:esc(p.e);
+    const sBody=q.goal?`<span class="items">${chips(p.s)}</span>`:esc(p.s);
+    html+=`<div class="refq">
+      <div class="rh"><span class="qk">${q.k}</span><span class="qname">${q.q}</span></div>
+      <div class="side"><span class="who">${role==='emp'?'You':EMP.short}</span><span class="tx">${eBody}</span></div>
+      <div class="side"><span class="who">${role==='emp'?SUP.short+' (sup)':'You (sup)'}</span><span class="tx">${sBody}</span></div>
+    </div>`;
+  });
+  return widgetShell('wPpm'+suffix,'Last PPM',PRIOR.date+' · both sides · read-only',html);
+}
+function renderLastCva(suffix){
+  let html=`<div class="refhead"><b>2025 CVA</b> · signed Mar 2026 <span class="tag">Complete</span><button class="btn sm ghost" style="margin-left:auto;" onclick="toast('Archive PDF opened (mock)')">PDF</button></div>`;
+  let cursec='';
+  LASTCVA.forEach(c=>{
+    html+=`<div class="refcat"><div class="rh"><span class="cn">${c.i}</span><span class="cname">${c.n}</span>${c.i===9?'':pill(c.r)}</div><div class="rt">${esc(c.c)}</div></div>`;
+  });
+  return widgetShell('wCva'+suffix,'Last Completed CVA','2025 · read-only',html);
+}
+function renderNotes(){
+  let html=`<div class="aidisclaim">AI suggests a target question and a phrasing rewrite only. The PPM has no ratings and AI never evaluates. Nothing is applied without your action — inserted text is yours to edit.</div>`;
+  SNOTES.forEach((n,idx)=>{
+    html+=`<div class="noteitem">
+      <div class="nd">${n.d}<span style="color:var(--line-strong);">·</span>Supervisor note · private</div>
+      <div class="nt">${esc(n.t)}</div>
+      <div class="nacts"><button class="aibtn" onclick="suggest(${idx})">${spark()} Suggest question &amp; phrasing</button></div>
+      <div id="nai${idx}"></div>
+    </div>`;
+  });
+  return widgetShell('wNotes','My Notes + AI',SNOTES.length+' notes this cycle',html);
+}
+function suggest(idx){
+  const n=SNOTES[idx];
+  const q=QMETA.find(x=>x.k===n.q);
+  document.getElementById('nai'+idx).innerHTML=`<div class="aicard">
+    <div class="ah">${spark()} AI suggestion · draft only</div>
+    <div class="amap">Best-fit question → <b>${n.q}</b> · ${esc(q.q.split('?')[0])}?</div>
+    <div class="atext">"${esc(n.ai)}"</div>
+    <div class="aacts">
+      <button class="abtn use" onclick="insertNote(${idx})">Insert into ${n.q}</button>
+      <button class="abtn dis" onclick="document.getElementById('nai${idx}').innerHTML=''">Dismiss</button>
+    </div>
+  </div>`;
+}
+function insertNote(idx){
+  const n=SNOTES[idx];
+  const ta=document.getElementById('ta-sup-'+n.q);
+  if(ta){ta.value=(ta.value?ta.value+' ':'')+n.ai; DRAFT.sup[n.q]=ta.value; ta.scrollIntoView({behavior:'smooth',block:'center'});}
+  document.getElementById('nai'+idx).innerHTML='';
+  toast(`Inserted into ${n.q} — edit as needed`);
+}
+
+/* --- workspace assembly --- */
+$('#mainZone1').innerHTML=renderFormWidget('emp');
+$('#rightStack1').innerHTML=renderLastPpm('emp','1')+renderLastCva('1');
+$('#mainZone2').innerHTML=renderFormWidget('sup');
+$('#rightStack2').innerHTML=renderLastPpm('sup','2')+renderLastCva('2')+renderNotes();
+
+/* sync draft state on textarea edits */
+document.addEventListener('input',e=>{
+  const id=e.target.id||'';
+  const m=id.match(/^ta-(emp|sup)-([A-F])$/);
+  if(m)DRAFT[m[1]][m[2]]=e.target.value;
+});
+
+/* ============================================================
+   DRAG / DOCK / TRAY (zones scoped per mode)
+   ============================================================ */
+const ZONEPAIRS={m1:['mainZone1','rightStack1','tray1'],m2:['mainZone2','rightStack2','tray2']};
+let dragId=null;
+document.addEventListener('dragstart',e=>{
+  const head=e.target.closest?.('.whead');
+  if(!head)return;
+  const w=head.closest('.widget');
+  dragId=w.id; w.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+});
+document.addEventListener('dragend',()=>{
+  document.querySelectorAll('.widget').forEach(w=>w.classList.remove('dragging'));
+  document.querySelectorAll('.zone').forEach(z=>z.classList.remove('droptarget'));
+  dragId=null;
+});
+Object.values(ZONEPAIRS).forEach(([mainId,stackId])=>{
+  [mainId,stackId].forEach(zid=>{
+    const z=document.getElementById(zid);
+    z.addEventListener('dragover',e=>{
+      if(!dragId)return;
+      const dw=document.getElementById(dragId);
+      if(!sameMode(dw,z))return;
+      e.preventDefault(); z.classList.add('droptarget');
+    });
+    z.addEventListener('dragleave',()=>z.classList.remove('droptarget'));
+    z.addEventListener('drop',e=>{
+      e.preventDefault(); z.classList.remove('droptarget');
+      if(!dragId)return;
+      const w=document.getElementById(dragId);
+      if(!sameMode(w,z)){dragId=null;return;}
+      if(zid===mainId){toMain(dragId);}
+      else{
+        const sibs=[...z.querySelectorAll(':scope > .widget')].filter(x=>x!==w);
+        const y=e.clientY;
+        let before=null;
+        for(const s of sibs){const r=s.getBoundingClientRect(); if(y<r.top+r.height/2){before=s;break;}}
+        z.insertBefore(w,before);
+      }
+      dragId=null;
+    });
+  });
+});
+function modeOf(el){return el.closest('.mode').id;}
+function sameMode(a,b){return a&&b&&modeOf(a)===modeOf(b);}
+function pairFor(el){return ZONEPAIRS[modeOf(el)];}
+function toMain(id){
+  const w=document.getElementById(id);
+  const [mainId]=pairFor(w);
+  const main=document.getElementById(mainId);
+  const current=main.querySelector(':scope > .widget');
+  if(current===w)return;
+  if(current)document.getElementById(pairFor(w)[1]).prepend(current);
+  main.appendChild(w);
+}
+function minimizeWidget(id){
+  const w=document.getElementById(id);
+  const [,,trayId]=pairFor(w);
+  const title=w.dataset.title;
+  w.style.display='none';
+  const pill=document.createElement('button');
+  pill.className='traypill'; pill.innerHTML=`${title} <span class="up">▲</span>`;
+  pill.onclick=()=>{w.style.display=''; pill.remove();};
+  document.getElementById(trayId).appendChild(pill);
+}
+
+/* ============================================================
+   MODE 3 · READY TO MEET
+   ============================================================ */
+function setView3(v,btn){
+  document.querySelectorAll('#vt3 button').forEach(b=>b.classList.toggle('on',b===btn));
+  renderM3(v);
+}
+function renderM3(view){
+  const mySide=view==='sup'?'sup':'emp';
+  const rows=[
+    {who:EMP,cls:'emp',label:'Employee side',date:'Aug 6',mine:mySide==='emp'},
+    {who:SUP,cls:'sup',label:'Supervisor side',date:'Aug 4',mine:mySide==='sup'},
+  ];
+  let html='';
+  rows.forEach(r=>{
+    html+=`<div class="siderow">
+      <div class="sav ${r.cls}">${r.who.name.split(' ').map(x=>x[0]).join('')}</div>
+      <div class="swho"><div class="sn">${r.who.name}</div><div class="sr">${r.label} · Submitted ${r.date}</div></div>
+      <div class="sst ${r.mine?'ok':'locked'}">${r.mine
+        ?`Your side · <button class="btn sm ghost" onclick="toast('Read-only review of your submitted side (mock)')">review</button>`
+        :`🔒 Sealed until merge`}</div>
+    </div>`;
+  });
+  if(view==='sup'){
+    html+=`<div class="meetband">Both sides are in. <b>Meet with ${EMP.short} in person</b>, then release the merge. Releasing reveals both sides to both of you, locks all answers, and moves the PPM to <b>Merged</b>.</div>
+    <div class="releaserow">
+      <button class="btn pri" onclick="openDialog('Release merge','Confirm that you and ${EMP.short} have met. Releasing reveals both sides to both parties and locks the PPM for signatures.','${SUP.name}')">Release merge ▸</button>
+      <span class="hint">Supervisor-only action · enabled because both sides are Submitted</span>
+    </div>`;
+  }else{
+    html+=`<div class="meetband">Both sides are in. <b>${SUP.short} will release the merged PPM after your meeting.</b> Until then, neither of you can see the other's answers, and your own side is locked.</div>`;
+  }
+  $('#m3Body').innerHTML=html;
+}
+renderM3('sup');
+
+/* ============================================================
+   MODES 4 & 5 · MERGED / COMPLETE
+   ============================================================ */
+function renderMerged(complete){
+  let html=`<div class="pchead"><span class="t">PPM · Aug 2026 · merged record</span>
+    <span style="margin-left:auto;font-size:11px;color:var(--ink-2);font-weight:600;">Released by ${SUP.name} · Aug 12</span></div>`;
+  let cursec='';
+  QMETA.forEach(q=>{
+    if(q.sec!==cursec){cursec=q.sec;html+=`<div class="secdiv">${cursec}</div>`;}
+    const e=DRAFT.emp[q.k], s=DRAFT.sup[q.k];
+    html+=`<div class="mq">
+      <div class="mqh"><span class="qk">${q.k}</span><span class="qtext">${q.q}</span>${q.goal?'<span class="planflag">Plan of record</span>':''}</div>
+      <div class="mgrid">
+        <div class="mpane"><div class="ph">Employee · ${EMP.name}</div>${q.goal?`<div class="gchips-ro">${chips(e)}</div>`:`<div class="ptext">${esc(e)}</div>`}</div>
+        <div class="mpane"><div class="ph">Supervisor · ${SUP.name}</div>${q.goal?`<div class="gchips-ro">${chips(s)}</div>`:`<div class="ptext">${esc(s)}</div>`}</div>
+      </div>
+    </div>`;
+  });
+  html+=`<div class="secdiv">Signatures</div><div class="signrow">
+    <div class="sigcard"><div class="sl">Supervisor</div><div class="sig">${SUP.name}</div><div class="sd">Aug 12, 2026 · at merge release</div></div>
+    ${complete
+      ?`<div class="sigcard"><div class="sl">Employee</div><div class="sig">${EMP.name}</div><div class="sd">Aug 13, 2026</div></div>`
+      :`<div class="sigcard pending"><div class="sl">Employee</div><div class="sig">Awaiting your signature — use "Sign off on PPM" above</div></div>`}
+  </div>`;
+  if(complete){
+    html+=`<div class="hrband">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>
+      Complete · HR visibility active from this point. Section 2 goals are now the plan of record and will frame Section 1 of the next PPM.
+    </div>`;
+  }
+  return html;
+}
+$('#m4Card').innerHTML=renderMerged(false);
+$('#m5Card').innerHTML=renderMerged(true);
+
+/* ============================================================
+   SIGN DIALOG
+   ============================================================ */
+function openDialog(title,desc,signer){
+  $('#dlgTitle').textContent=title;
+  $('#dlgDesc').textContent=desc;
+  $('#dlgSig').textContent=signer||EMP.name;
+  $('#signOverlay').classList.add('on');
+}
+function closeDialog(){$('#signOverlay').classList.remove('on');}
+function applySig(){
+  closeDialog();
+  toast('Signature applied (mock)');
+}
+$('#signOverlay').addEventListener('click',e=>{if(e.target.id==='signOverlay')closeDialog();});
+
+/* init */
+renderHeader(1);
+</script>
+</body>
+</html>
