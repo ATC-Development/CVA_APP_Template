@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC CVA · UI Prototypes</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e9edf0;
+  --card:#ffffff;
+  --card-2:#f5f7f9;
+  --ink:#16232e;
+  --ink-2:#4d5d6b;
+  --ink-3:#8b99a5;
+  --line:rgba(22,35,46,.12);
+  --line-strong:rgba(22,35,46,.22);
+  --atc:#2a97d4;
+  --atc-deep:#12639b;
+  --atc-wash:#e8f4fb;
+  --r:14px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --paper:#141a1f; --card:#1e262d; --card-2:#242e36;
+    --ink:#e7edf2; --ink-2:#9fb0bd; --ink-3:#657683;
+    --line:rgba(231,237,242,.10); --line-strong:rgba(231,237,242,.22);
+    --atc:#4db1e8; --atc-deep:#a5d8f5; --atc-wash:#0e2c40;
+  }
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  font-family:var(--font); background:var(--paper); color:var(--ink);
+  font-size:15px; -webkit-font-smoothing:antialiased; min-height:100vh;
+}
+.wrap{max-width:860px; margin:0 auto; padding:56px 24px 64px;}
+.brand{display:flex; align-items:center; gap:12px;}
+.brand .mark{width:34px;height:34px;border-radius:8px;background:var(--atc);display:grid;place-items:center;font-weight:900;color:#fff;font-size:15px;}
+.brand .t{font-weight:800; font-size:15px; letter-spacing:.02em;}
+.brand .t small{display:block;font-weight:700;font-size:10px;color:var(--ink-3);letter-spacing:.16em;text-transform:uppercase;}
+h1{
+  margin-top:34px; font-size:34px; font-weight:800; line-height:1.15;
+  font-variation-settings:'wdth' 112; letter-spacing:-.01em;
+}
+.lede{margin-top:12px; color:var(--ink-2); font-size:15px; line-height:1.6; max-width:62ch;}
+.lede b{color:var(--ink);}
+
+.cards{margin-top:36px; display:grid; gap:16px;}
+a.proto{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+  padding:22px 24px; transition:border-color .12s, transform .12s, box-shadow .12s;
+}
+a.proto:hover{border-color:var(--atc); transform:translateY(-1px); box-shadow:0 6px 18px rgba(22,35,46,.08);}
+.proto .ph{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+.proto .num{font-size:12px; font-weight:800; color:var(--atc-deep); background:var(--atc-wash); padding:3px 10px; border-radius:99px; letter-spacing:.06em;}
+.proto h2{font-size:19px; font-weight:800; font-variation-settings:'wdth' 108;}
+.proto .file{margin-left:auto; font-size:11.5px; color:var(--ink-3); font-weight:700; font-family:ui-monospace,'Cascadia Code',Consolas,monospace;}
+.proto p{margin-top:9px; color:var(--ink-2); font-size:13.5px; line-height:1.6;}
+.proto ul{margin:10px 0 0 0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px;}
+.proto ul li{
+  font-size:11px; font-weight:700; color:var(--ink-2); background:var(--card-2);
+  border:1px solid var(--line); border-radius:99px; padding:4px 11px;
+}
+.proto .go{margin-top:14px; font-size:12.5px; font-weight:800; color:var(--atc-deep);}
+.proto .go::after{content:' →';}
+
+.notebox{
+  margin-top:34px; border:1px solid var(--line); border-left:4px solid var(--atc);
+  border-radius:10px; background:var(--card); padding:16px 20px;
+  font-size:13px; color:var(--ink-2); line-height:1.6;
+}
+.notebox b{color:var(--ink);}
+.foot{margin-top:40px; font-size:11px; color:var(--ink-3); letter-spacing:.1em; text-transform:uppercase; font-weight:700;}
+a:focus-visible{outline:2px solid var(--atc); outline-offset:3px; border-radius:var(--r);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="mark">A</div>
+    <div class="t">ATC Development<small>Information &amp; Systems</small></div>
+  </div>
+
+  <h1>CVA Application · UI Prototypes</h1>
+  <p class="lede">
+    Design references for the ground-up rebuild of the <b>Core Value Assessment</b> application
+    (React PWA + ASP.NET Core API). These are single-file HTML mockups with sample data —
+    they define layout, interaction, and visual language for the build. They are not connected
+    to any data source and nothing entered here is saved.
+  </p>
+
+  <div class="cards">
+
+    <a class="proto" href="CVA_Dashboard.html">
+      <div class="ph">
+        <span class="num">01</span>
+        <h2>Dashboard</h2>
+        <span class="file">CVA_Dashboard.html</span>
+      </div>
+      <p>
+        The landing experience. A three-role "hat" model — <b>Mine</b> (employee),
+        <b>My Team</b> (supervisor), and <b>HR Operations</b> — selectable within one interface.
+        Establishes the Stage Track as the system's signature visual and the modal patterns for
+        record view, history, notes, pipeline detail, assign &amp; start, and the org hierarchy browser.
+      </p>
+      <ul>
+        <li>Role switching</li><li>Stage Track (hero / row / aggregate)</li>
+        <li>Identity rail</li><li>Org hierarchy modal</li><li>Assign &amp; start</li>
+      </ul>
+      <div class="go">Open the dashboard prototype</div>
+    </a>
+
+    <a class="proto" href="CVA_Form_Screens.html">
+      <div class="ph">
+        <span class="num">02</span>
+        <h2>CVA Form Screens</h2>
+        <span class="file">CVA_Form_Screens.html</span>
+      </div>
+      <p>
+        The assessment lifecycle, one screen per stage. Six modes on a top switcher:
+        <b>Independent Review</b> (dockable widget workspace — form, last CVA, PPM reference,
+        notes with AI assist), <b>Final Combine</b> (three-column blend with divergence flags),
+        <b>HR Review</b> (category-anchored notes), <b>Returned to Primary</b> (inline HR notes,
+        mark-addressed), <b>Employee Sign-off</b>, and <b>Executive Review</b>.
+      </p>
+      <ul>
+        <li>Docked widgets + tray</li><li>Independent grading</li><li>Copy → Final</li>
+        <li>AI suggest-only</li><li>HR note flow</li><li>Signature dialogs</li>
+      </ul>
+      <div class="go">Open the form screens prototype</div>
+    </a>
+
+  </div>
+
+  <div class="notebox">
+    <b>Ground rules reflected in these prototypes:</b> reviewers grade independently and cannot
+    see each other's drafts until both are signed · AI assistance is suggest-only (category
+    mapping and phrasing) and never assigns or implies a rating · HR notes live in their own
+    table and are rendered alongside the form, never merged into comment text · every
+    lifecycle transition is an explicit, signed human action.
+  </div>
+
+  <div class="foot">ATC CVA Rebuild · UI prototype set · sample data only</div>
+
+</div>
+</body>
+</html>
