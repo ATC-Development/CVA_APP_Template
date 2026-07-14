@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ATC CVA · Mobile Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e9edf0;
+  --card:#ffffff;
+  --card-2:#f5f7f9;
+  --ink:#16232e;
+  --ink-2:#4d5d6b;
+  --ink-3:#8b99a5;
+  --line:rgba(22,35,46,.12);
+  --line-strong:rgba(22,35,46,.22);
+
+  --atc:#2a97d4;
+  --atc-deep:#12639b;
+  --atc-wash:#e8f4fb;
+
+  --ok:#2e7d4f;   --ok-wash:#e8f4ec;
+  --warn:#b06a1a; --warn-wash:#fbf1e2;
+  --alert:#bf3a2b;--alert-wash:#fbeae7;
+  --ppm:#6d4fa1;  --ppm-wash:#f1ecf9;
+
+  --r:12px; --rs:7px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --tabbar-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:var(--font);
+  background:#c9d2d8;
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.4;
+}
+
+/* ============ PHONE FRAME (prototype chrome, desktop viewing) ============ */
+.phone{
+  max-width:400px;
+  margin:0 auto;
+  height:100dvh;
+  max-height:880px;
+  background:var(--paper);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+@media(min-width:480px){
+  body{padding:24px 0;}
+  .phone{
+    height:calc(100dvh - 48px);
+    border-radius:28px;
+    box-shadow:0 24px 64px rgba(22,35,46,.35);
+    border:1px solid var(--line-strong);
+  }
+}
+
+/* ============ SHARED ============ */
+.screen{
+  flex:1;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  display:none;
+  padding-bottom:calc(var(--tabbar-h) + 16px);
+}
+.screen.on{display:block;}
+
+.apphead{
+  position:sticky;top:0;z-index:20;
+  background:var(--paper);
+  padding:14px 16px 10px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--line);
+}
+.apphead .brand{
+  font-weight:800;font-size:16px;letter-spacing:.02em;
+  font-variation-settings:'wdth' 112;
+}
+.apphead .brand b{color:var(--atc);}
+.apphead .spacer{flex:1;}
+.iconbtn{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink-2);cursor:pointer;position:relative;
+}
+.iconbtn svg{width:18px;height:18px;}
+.iconbtn .ndot{
+  position:absolute;top:6px;right:7px;width:8px;height:8px;
+  border-radius:50%;background:var(--alert);border:1.5px solid var(--card);
+}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--atc-deep);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;cursor:pointer;
+}
+
+.pad{padding:14px 16px;}
+.sect{
+  font-size:11px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);
+  margin:18px 16px 8px;
+  display:flex;align-items:center;gap:8px;
+}
+.sect .cnt{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:20px;padding:0 7px;font-size:10px;color:var(--ink-2);
+}
+
+.cardlist{margin:0 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;}
+.crow{
+  padding:13px 14px;display:flex;flex-direction:column;gap:6px;
+  border-bottom:1px solid var(--line);cursor:pointer;position:relative;
+}
+.crow:last-child{border-bottom:none;}
+.crow:active{background:var(--card-2);}
+.crow .r1{display:flex;align-items:baseline;gap:8px;}
+.crow .who{font-weight:700;font-size:14.5px;}
+.crow .meta{font-size:12px;color:var(--ink-3);}
+.crow .chev{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  color:var(--ink-3);
+}
+.crow .chev svg{width:16px;height:16px;}
+
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;
+}
+.tag.cva{background:var(--atc-wash);color:var(--atc-deep);}
+.tag.ppm{background:var(--ppm-wash);color:var(--ppm);}
+.tag.warn{background:var(--warn-wash);color:var(--warn);}
+.tag.alert{background:var(--alert-wash);color:var(--alert);}
+.tag.ok{background:var(--ok-wash);color:var(--ok);}
+
+/* ============ STAGE TRACK (micro-bar) ============ */
+.microtrack{display:flex;gap:3px;align-items:center;max-width:210px;}
+.microtrack .seg{
+  flex:1;height:5px;border-radius:3px;background:var(--line);
+}
+.microtrack .seg.done{background:var(--atc);}
+.microtrack .seg.cur{background:var(--atc-deep);box-shadow:0 0 0 2px var(--atc-wash);}
+.stagelabel{font-size:12px;font-weight:600;color:var(--atc-deep);}
+
+/* aggregate strip */
+.aggstrip{
+  margin:0 16px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px 10px 8px;
+  display:flex;gap:4px;
+}
+.aggseg{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 2px;border-radius:var(--rs);cursor:pointer;border:1px solid transparent;
+}
+.aggseg .n{font-weight:800;font-size:15px;font-variation-settings:'wdth' 110;}
+.aggseg .l{font-size:8.5px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);text-transform:uppercase;}
+.aggseg.sel{background:var(--atc-wash);border-color:var(--atc);}
+.aggseg.sel .n{color:var(--atc-deep);}
+.aggseg:active{background:var(--card-2);}
+
+/* ============ BUTTONS ============ */
+.btn{
+  font-family:var(--font);font-size:14px;font-weight:700;
+  border-radius:var(--rs);border:1px solid var(--line-strong);
+  background:var(--card);color:var(--ink);
+  padding:10px 16px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+}
+.btn.pri{background:var(--atc-deep);border-color:var(--atc-deep);color:#fff;}
+.btn.pri:active{background:var(--atc);}
+.btn.block{display:flex;width:calc(100% - 32px);margin:12px 16px 0;}
+.btn.sm{font-size:12.5px;padding:6px 12px;}
+.btn svg{width:17px;height:17px;}
+
+/* ============ SEGMENTED CONTROL (hat) ============ */
+.seg-ctl{
+  margin:10px 16px 2px;display:flex;background:var(--card-2);
+  border:1px solid var(--line);border-radius:var(--r);padding:3px;gap:3px;
+}
+.seg-ctl button{
+  flex:1;border:none;background:transparent;border-radius:9px;
+  font-family:var(--font);font-size:12.5px;font-weight:700;
+  padding:8px 4px;color:var(--ink-3);cursor:pointer;
+}
+.seg-ctl button.on{background:var(--card);color:var(--atc-deep);box-shadow:0 1px 3px rgba(22,35,46,.14);}
+
+/* ============ HERO CARD (quick note) ============ */
+.qnote-hero{
+  margin:14px 16px 0;
+  background:linear-gradient(135deg,var(--atc-deep),var(--atc));
+  border-radius:var(--r);padding:16px;color:#fff;cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 6px 18px rgba(18,99,155,.28);
+}
+.qnote-hero:active{transform:scale(.985);}
+.qnote-hero .qi{
+  width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.qnote-hero .qi svg{width:24px;height:24px;}
+.qnote-hero .qt{font-weight:800;font-size:15.5px;letter-spacing:.03em;font-variation-settings:'wdth' 110;}
+.qnote-hero .qd{font-size:12.5px;opacity:.85;margin-top:2px;}
+
+/* ============ TAB BAR ============ */
+.tabbar{
+  position:absolute;bottom:0;left:0;right:0;height:var(--tabbar-h);
+  background:var(--card);border-top:1px solid var(--line-strong);
+  display:flex;z-index:30;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tabbar button{
+  flex:1;border:none;background:transparent;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.04em;
+  color:var(--ink-3);
+}
+.tabbar button svg{width:22px;height:22px;}
+.tabbar button.on{color:var(--atc-deep);}
+.tabbar button .bdg{
+  position:relative;
+}
+.tabbar button .bdg .ndot{
+  position:absolute;top:-2px;right:-4px;width:8px;height:8px;border-radius:50%;
+  background:var(--alert);border:1.5px solid var(--card);
+}
+
+/* ============ BOTTOM SHEET ============ */
+.scrim{
+  position:absolute;inset:0;background:rgba(22,35,46,.45);
+  opacity:0;pointer-events:none;transition:opacity .22s;z-index:40;
+}
+.scrim.on{opacity:1;pointer-events:auto;}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:50;
+  background:var(--card);border-radius:20px 20px 0 0;
+  transform:translateY(105%);transition:transform .26s cubic-bezier(.32,.72,.28,1);
+  padding:8px 16px calc(18px + env(safe-area-inset-bottom));
+  max-height:86%;overflow-y:auto;
+}
+.sheet.on{transform:translateY(0);}
+.sheet .handle{
+  width:38px;height:4px;border-radius:3px;background:var(--line-strong);
+  margin:4px auto 12px;
+}
+.sheet h3{
+  font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-2);display:flex;align-items:center;
+}
+.sheet h3 .x{margin-left:auto;}
+.fld{margin-top:14px;}
+.fld label{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:6px;
+}
+.fld input[type=text],.fld textarea,.fld select{
+  width:100%;font-family:var(--font);font-size:15px;color:var(--ink);
+  background:var(--card-2);border:1px solid var(--line);border-radius:var(--rs);
+  padding:11px 12px;outline:none;
+}
+.fld textarea{min-height:96px;resize:vertical;}
+.fld input:focus,.fld textarea:focus{border-color:var(--atc);background:#fff;box-shadow:0 0 0 3px var(--atc-wash);}
+.chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{
+  font-family:var(--font);font-size:12.5px;font-weight:700;
+  border:1px solid var(--line);background:var(--card-2);color:var(--ink-2);
+  border-radius:20px;padding:7px 13px;cursor:pointer;
+}
+.chip.on{background:var(--atc-deep);border-color:var(--atc-deep);color:#fff;}
+.chip.emp.on{background:var(--ink);border-color:var(--ink);}
+
+/* ============ NOTES SCREEN ============ */
+.privacy-note{
+  margin:12px 16px 0;padding:9px 12px;border-radius:var(--rs);
+  background:var(--atc-wash);color:var(--atc-deep);
+  font-size:12px;font-weight:600;display:flex;gap:8px;align-items:center;
+}
+.privacy-note svg{width:15px;height:15px;flex-shrink:0;}
+.notecard{
+  margin:0 16px 10px;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);padding:12px 14px;
+}
+.notecard .nr1{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.notecard .who{font-weight:700;font-size:14px;}
+.notecard .dt{margin-left:auto;font-size:11.5px;color:var(--ink-3);}
+.notecard .body{font-size:13.5px;color:var(--ink-2);}
+.notecard .nact{margin-top:8px;display:flex;}
+.notecard .retire{
+  margin-left:auto;font-family:var(--font);font-size:11.5px;font-weight:700;
+  color:var(--ink-3);background:none;border:none;cursor:pointer;
+  text-decoration:underline;text-underline-offset:2px;
+}
+.notecard.retired{opacity:.55;}
+.notecard.retired .body{text-decoration:line-through;}
+.notecard .retiredtag{font-size:10.5px;font-weight:700;color:var(--warn);letter-spacing:.05em;text-transform:uppercase;}
+
+/* value chip colors on note rows */
+.vchip{
+  font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:5px;
+  padding:2px 6px;background:var(--card-2);border:1px solid var(--line);color:var(--ink-2);
+}
+
+/* ============ STUB SCREENS ============ */
+.stub{
+  margin:60px 24px;text-align:center;color:var(--ink-3);
+}
+.stub svg{width:40px;height:40px;margin-bottom:12px;}
+.stub b{display:block;color:var(--ink-2);font-size:15px;margin-bottom:4px;}
+.stub span{font-size:13px;}
+
+/* ============ TOAST ============ */
+.toast{
+  position:absolute;left:50%;bottom:calc(var(--tabbar-h) + 18px);
+  transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;font-size:13px;font-weight:600;
+  border-radius:20px;padding:9px 18px;opacity:0;transition:all .25s;
+  z-index:60;pointer-events:none;white-space:nowrap;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* greeting */
+.greet{margin:16px 16px 0;font-size:20px;font-weight:800;font-variation-settings:'wdth' 108;}
+.greet small{display:block;font-size:12.5px;font-weight:500;color:var(--ink-3);margin-top:2px;}
+
+/* ============ HERO STAGE TRACK ============ */
+.herocard{margin:0 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;}
+.herotrack{display:flex;margin:14px 0 4px;}
+.hstep{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
+.hstep .hbar{position:absolute;top:4px;left:50%;width:100%;height:3px;background:var(--line);}
+.hstep:last-child .hbar{display:none;}
+.hstep .hdot{width:11px;height:11px;border-radius:50%;background:var(--line);position:relative;z-index:1;}
+.hstep.done .hdot{background:var(--atc);}
+.hstep.done .hbar{background:var(--atc);}
+.hstep.cur .hdot{background:var(--atc-deep);box-shadow:0 0 0 3px var(--atc-wash);}
+.hstep .hl{font-size:8px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.02em;text-align:center;line-height:1.15;}
+.hstep.cur .hl{color:var(--atc-deep);}
+
+/* ============ PPM STATE + TILES ============ */
+.pstate{width:13px;height:13px;border-radius:50%;border:2.5px solid var(--ppm);display:inline-block;flex-shrink:0;background:transparent;}
+.pstate.half{background:linear-gradient(90deg,var(--ppm) 50%,rgba(0,0,0,0) 50%);}
+.pstate.full{background:var(--ppm);}
+.tiles{margin:0 16px;display:flex;gap:8px;}
+.tile{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 6px;text-align:center;}
+.tile .n{font-weight:800;font-size:19px;font-variation-settings:'wdth' 110;}
+.tile .l{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:2px;}
+
+/* ============ FORM SCREENS ============ */
+.stepper{margin:12px 16px 0;display:flex;gap:5px;}
+.stepper button{flex:1;font-family:var(--font);font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--card);color:var(--ink-3);border-radius:var(--rs);padding:8px 2px;cursor:pointer;}
+.stepper button.donestep{color:var(--atc-deep);border-color:var(--atc);background:var(--atc-wash);}
+.stepper button.on{background:var(--atc-deep);border-color:var(--atc-deep);color:#fff;}
+.ratepills{display:flex;gap:7px;}
+.ratepills button{flex:1;font-family:var(--font);font-size:15px;font-weight:800;border:1px solid var(--line);background:var(--card-2);color:var(--ink-2);border-radius:var(--rs);padding:11px 0;cursor:pointer;}
+.ratepills button.on.rp{background:var(--ok-wash);border-color:var(--ok);color:var(--ok);}
+.ratepills button.on.rpm{background:var(--warn-wash);border-color:var(--warn);color:var(--warn);}
+.ratepills button.on.rm{background:var(--alert-wash);border-color:var(--alert);color:var(--alert);}
+.sumrow .sr.rp{color:var(--ok);background:var(--ok-wash);}
+.sumrow .sr.rpm{color:var(--warn);background:var(--warn-wash);}
+.sumrow .sr.rm{color:var(--alert);background:var(--alert-wash);}
+.aihint{margin-top:12px;background:var(--card-2);border:1px solid var(--line);border-radius:var(--rs);padding:10px 12px;font-size:12.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:8px;}
+.aihint .ar{display:flex;align-items:center;gap:8px;}
+.aihint .ar svg{width:16px;height:16px;flex-shrink:0;color:var(--ink-3);}
+.aihint .ar .btn.sm{margin-left:auto;}
+.aicaption{font-size:11px;color:var(--ink-3);}
+.formfoot{display:flex;gap:10px;margin-top:16px;}
+.formfoot .btn{flex:1;}
+.autosave{font-size:11.5px;color:var(--ink-3);text-align:center;margin-top:10px;}
+.autosave b{color:var(--ok);}
+.sumrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);}
+.sumrow:last-child{border-bottom:none;}
+.sumrow .sv{font-size:13.5px;font-weight:600;flex:1;}
+.sumrow .sr{font-size:13px;font-weight:800;color:var(--atc-deep);background:var(--atc-wash);border-radius:6px;padding:2px 9px;white-space:nowrap;}
+.sumrow .sr.miss{color:var(--warn);background:var(--warn-wash);}
+
+/* ============ SIGN-OFF SHEET ============ */
+.so-meta{margin-top:12px;background:var(--card-2);border:1px solid var(--line);border-radius:var(--rs);padding:10px 12px;font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px;}
+.so-meta b{color:var(--ink);}
+.sigwrap{margin-top:14px;border:1.5px dashed var(--line-strong);border-radius:var(--rs);background:var(--card-2);position:relative;overflow:hidden;}
+.sigwrap canvas{display:block;width:100%;height:140px;touch-action:none;}
+.sigwrap .sighint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:13px;pointer-events:none;}
+.checkrow{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:13px;color:var(--ink-2);}
+.checkrow input{width:18px;height:18px;margin-top:1px;accent-color:var(--atc-deep);flex-shrink:0;}
+
+@media(prefers-reduced-motion:reduce){
+  .sheet,.scrim,.toast{transition:none;}
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ================= HOME ================= -->
+  <div class="screen on" id="scr-home">
+    <div class="apphead">
+      <div class="brand">ATC · <b>CVA</b></div>
+      <div class="spacer"></div>
+      <button class="iconbtn" onclick="toast('Notifications (mock)')" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></svg>
+        <span class="ndot"></span>
+      </button>
+      <div class="avatar" onclick="go('me')">JL</div>
+    </div>
+
+    <div class="greet">Good morning, Jamie<small>Tuesday, July 14</small></div>
+
+    <div class="qnote-hero" onclick="openSheet()">
+      <div class="qi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>
+      </div>
+      <div>
+        <div class="qt">Quick note</div>
+        <div class="qd">Log a note on an employee</div>
+      </div>
+    </div>
+
+    <div class="sect">Needs your action <span class="cnt">3</span></div>
+    <div class="cardlist">
+      <div class="crow" onclick="openCvaForm('Barry Slaymaker','Primary',3)">
+        <div class="r1"><span class="who">Barry Slaymaker</span><span class="tag cva">CVA</span></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="microtrack">
+            <div class="seg done"></div><div class="seg done"></div><div class="seg done"></div>
+            <div class="seg cur"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+          </div>
+          <span class="stagelabel">With primary</span>
+        </div>
+        <div class="meta">You are Primary · due Jul 21</div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+      <div class="crow" onclick="openSignoff('PPM · Meg Johnson','Supervisor','Complete')">
+        <div class="r1"><span class="who">Meg Johnson</span><span class="tag ppm">PPM</span></div>
+        <div class="meta">Both sides in — awaiting your sign-off</div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+      <div class="crow" onclick="go('me')">
+        <div class="r1"><span class="who">Your CVA</span><span class="tag alert">Signature required</span></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="microtrack">
+            <div class="seg done"></div><div class="seg done"></div><div class="seg done"></div>
+            <div class="seg done"></div><div class="seg cur"></div><div class="seg"></div><div class="seg"></div>
+          </div>
+          <span class="stagelabel">With employee</span>
+        </div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+    </div>
+
+    <div class="sect">Coming up</div>
+    <div class="cardlist">
+      <div class="crow" onclick="go('cva')">
+        <div class="r1"><span class="who" style="font-size:13.5px;">2 anniversaries in the next 30 days</span></div>
+        <div class="meta">S. Mitchell · Jul 30 &nbsp;·&nbsp; T. Reyes · Aug 12</div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+      <div class="crow" onclick="go('ppm')">
+        <div class="r1"><span class="who" style="font-size:13.5px;">1 PPM window opens Aug 4</span></div>
+        <div class="meta">Sarah Mitchell · window Aug 4 – Aug 18</div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CVA ================= -->
+  <div class="screen" id="scr-cva">
+    <div class="apphead">
+      <div class="brand">CVA</div>
+      <div class="spacer"></div>
+      <div class="avatar" onclick="go('me')">JL</div>
+    </div>
+
+    <div class="seg-ctl" role="tablist" aria-label="View as">
+      <button onclick="setHat(this,'mine')">Mine</button>
+      <button class="on" onclick="setHat(this,'team')">My Team</button>
+      <button onclick="setHat(this,'hr')">HR Ops</button>
+    </div>
+
+    <div id="cva-team">
+      <div class="sect">Pipeline · my team</div>
+      <div class="aggstrip" id="agg">
+        <div class="aggseg" onclick="aggFilter(this,0)"><span class="n">1</span><span class="l">Strt</span></div>
+        <div class="aggseg" onclick="aggFilter(this,1)"><span class="n">2</span><span class="l">Rvw</span></div>
+        <div class="aggseg" onclick="aggFilter(this,2)"><span class="n">1</span><span class="l">HR</span></div>
+        <div class="aggseg" onclick="aggFilter(this,3)"><span class="n">3</span><span class="l">Pri</span></div>
+        <div class="aggseg" onclick="aggFilter(this,4)"><span class="n">1</span><span class="l">Emp</span></div>
+        <div class="aggseg" onclick="aggFilter(this,5)"><span class="n">0</span><span class="l">Exe</span></div>
+        <div class="aggseg" onclick="aggFilter(this,6)"><span class="n">4</span><span class="l">Cmp</span></div>
+      </div>
+
+      <div class="sect">Active CVAs <span class="cnt" id="activecnt">8</span></div>
+      <div class="cardlist" id="cvalist">
+        <div class="crow" data-stage="3" onclick="openCvaForm('Sarah Mitchell','Primary',3)">
+          <div class="r1"><span class="who">Sarah Mitchell</span></div>
+          <div class="meta">Property Manager · Anniversary Jul 30</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="microtrack">
+              <div class="seg done"></div><div class="seg done"></div><div class="seg done"></div>
+              <div class="seg cur"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+            </div>
+            <span class="stagelabel">With primary</span>
+          </div>
+          <div class="meta">You are <b style="color:var(--ink-2)">Primary</b></div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" data-stage="1" onclick="openCvaForm('Tom Reyes','Secondary',1)">
+          <div class="r1"><span class="who">Tom Reyes</span></div>
+          <div class="meta">Maintenance Tech · Anniversary Aug 12</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="microtrack">
+              <div class="seg done"></div><div class="seg cur"></div><div class="seg"></div>
+              <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+            </div>
+            <span class="stagelabel">With reviewers</span>
+          </div>
+          <div class="meta">You are <b style="color:var(--ink-2)">Secondary</b></div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" data-stage="6" onclick="toast('Archive PDF (mock)')">
+          <div class="r1"><span class="who">Dana Carter</span><span class="tag ok">Complete</span></div>
+          <div class="meta">Leasing Agent · Completed Jun 2</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+
+      <button class="btn pri block" onclick="toast('Assign &amp; start sheet (next slice)')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Assign &amp; start CVA
+      </button>
+      <button class="btn block" onclick="toast('Org hierarchy (next slice)')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M12 9l-6 4M12 9l6 4M6 13v5M18 13v5"/></svg>
+        Org hierarchy
+      </button>
+    </div>
+
+    <div id="cva-mine" style="display:none;">
+      <div class="sect">My current CVA</div>
+      <div class="cardlist">
+        <div class="crow" onclick="go('me')">
+          <div class="r1"><span class="who">2026 Annual CVA</span><span class="tag alert">Signature required</span></div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="microtrack">
+              <div class="seg done"></div><div class="seg done"></div><div class="seg done"></div>
+              <div class="seg done"></div><div class="seg cur"></div><div class="seg"></div><div class="seg"></div>
+            </div>
+            <span class="stagelabel">With employee</span>
+          </div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+      <div class="sect">History</div>
+      <div class="cardlist">
+        <div class="crow" onclick="toast('Archive PDF (mock)')"><div class="r1"><span class="who" style="font-size:13.5px;">2025 CVA</span><span class="tag ok">Complete</span></div><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div></div>
+        <div class="crow" onclick="toast('Archive PDF (mock)')"><div class="r1"><span class="who" style="font-size:13.5px;">2024 CVA</span><span class="tag ok">Complete</span></div><div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div></div>
+      </div>
+    </div>
+
+    <div id="cva-hr" style="display:none;">
+      <div class="sect">Company pipeline · all 11 properties</div>
+      <div class="aggstrip">
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">4</span><span class="l">Strt</span></div>
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">7</span><span class="l">Rvw</span></div>
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">3</span><span class="l">HR</span></div>
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">5</span><span class="l">Pri</span></div>
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">2</span><span class="l">Emp</span></div>
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">1</span><span class="l">Exe</span></div>
+        <div class="aggseg" onclick="toast('Company pipeline detail (next slice)')"><span class="n">22</span><span class="l">Cmp</span></div>
+      </div>
+
+      <div class="sect">With HR — your queue <span class="cnt">3</span></div>
+      <div class="cardlist">
+        <div class="crow" onclick="toast('Record view (next slice)')">
+          <div class="r1"><span class="who">Kim Boyd</span></div>
+          <div class="meta">Riverside · Waiting 2 days</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" onclick="toast('Record view (next slice)')">
+          <div class="r1"><span class="who">An Nguyen</span><span class="tag warn">Waiting 5 days</span></div>
+          <div class="meta">Parkview</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" onclick="toast('Record view (next slice)')">
+          <div class="r1"><span class="who">Jun Park</span></div>
+          <div class="meta">Oakmont · Waiting 1 day</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="sect">Upcoming anniversaries</div>
+      <div class="seg-ctl" style="margin:0 16px 10px;">
+        <button class="on" onclick="setAnniv(this,45)">Next 45 days</button>
+        <button onclick="setAnniv(this,90)">Next 90 days</button>
+      </div>
+      <div class="cardlist" id="annivlist">
+        <div class="crow" data-window="45" style="cursor:default;">
+          <div class="r1"><span class="who">Rosa Alvarez</span></div>
+          <div class="meta">Parkview · Anniversary Aug 2 · No CVA yet</div>
+          <div><button class="btn sm pri startbtn" onclick="startAnniv(event,this)">Assign &amp; start</button></div>
+        </div>
+        <div class="crow" data-window="45" style="cursor:default;">
+          <div class="r1"><span class="who">David Chen</span></div>
+          <div class="meta">Riverside · Anniversary Aug 9 · No CVA yet</div>
+          <div><button class="btn sm pri startbtn" onclick="startAnniv(event,this)">Assign &amp; start</button></div>
+        </div>
+        <div class="crow" data-window="45" data-started="1" style="cursor:default;">
+          <div class="r1"><span class="who">Kim Boyd</span></div>
+          <div class="meta">Oakmont · Anniversary Aug 15</div>
+          <div><span class="tag ok">&#10003; CVA started</span></div>
+        </div>
+        <div class="crow" data-window="90" style="cursor:default;display:none;">
+          <div class="r1"><span class="who">Maria Ortiz</span></div>
+          <div class="meta">Elm Street · Anniversary Sep 12 · No CVA yet</div>
+          <div><button class="btn sm pri startbtn" onclick="startAnniv(event,this)">Assign &amp; start</button></div>
+        </div>
+        <div class="crow" data-window="90" style="cursor:default;display:none;">
+          <div class="r1"><span class="who">Lena Freeman</span></div>
+          <div class="meta">Riverside · Anniversary Oct 1 · No CVA yet</div>
+          <div><button class="btn sm pri startbtn" onclick="startAnniv(event,this)">Assign &amp; start</button></div>
+        </div>
+      </div>
+      <button class="btn block" id="batchstart" onclick="startAllUnstarted()">Start all unstarted (2)</button>
+      <button class="btn pri block" onclick="toast('Off-cycle CVA — assign &amp; start sheet (next slice)')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Off-cycle CVA
+      </button>
+      <button class="btn block" onclick="toast('Reports (next slice)')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8l4 -16l3 8h4"/></svg>
+        Reports
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= PPM ================= -->
+  <div class="screen" id="scr-ppm">
+    <div class="apphead"><div class="brand">PPM</div><div class="spacer"></div><div class="avatar" onclick="go('me')">JL</div></div>
+
+    <div class="seg-ctl" role="tablist" aria-label="View as">
+      <button onclick="setPpmHat(this,'mine')">Mine</button>
+      <button class="on" onclick="setPpmHat(this,'team')">My Team</button>
+      <button onclick="setPpmHat(this,'hr')">HR Ops</button>
+    </div>
+
+    <div id="ppm-team">
+      <div class="sect">This cycle · my team</div>
+      <div class="tiles">
+        <div class="tile"><div class="n" style="color:var(--ppm);">3</div><div class="l">Open</div></div>
+        <div class="tile"><div class="n">2</div><div class="l">Scheduled</div></div>
+        <div class="tile"><div class="n" style="color:var(--ok);">6</div><div class="l">Done</div></div>
+      </div>
+
+      <div class="sect">Open PPMs <span class="cnt">3</span></div>
+      <div class="cardlist">
+        <div class="crow" onclick="openPpmForm('Sarah Mitchell','Supervisor')">
+          <div class="r1"><span class="pstate"></span><span class="who">Sarah Mitchell</span></div>
+          <div class="meta">Window Aug 4 – Aug 18 · Not started</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" onclick="toast('Your side is submitted — awaiting employee')">
+          <div class="r1"><span class="pstate half"></span><span class="who">Tom Reyes</span></div>
+          <div class="meta">Supervisor side submitted · awaiting employee</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" onclick="openSignoff('PPM · Dana Carter','Supervisor','Complete')">
+          <div class="r1"><span class="pstate full"></span><span class="who">Dana Carter</span><span class="tag ppm">Sign-off ready</span></div>
+          <div class="meta">Both sides in — your sign-off completes it</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="sect">Completed this year <span class="cnt">6</span></div>
+      <div class="cardlist">
+        <div class="crow" onclick="toast('Completed PPM list (next slice)')">
+          <div class="r1"><span class="who" style="font-size:13.5px;">View completed PPMs</span></div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ppm-mine" style="display:none;">
+      <div class="sect">My current PPM</div>
+      <div class="cardlist">
+        <div class="crow" onclick="openPpmForm('Jamie Latiolais','Employee')">
+          <div class="r1"><span class="pstate half"></span><span class="who">2026 Mid-cycle PPM</span></div>
+          <div class="meta">Your side due Aug 18 · supervisor side submitted</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+      <div class="sect">History</div>
+      <div class="cardlist">
+        <div class="crow" onclick="toast('Archive PDF (mock)')">
+          <div class="r1"><span class="who" style="font-size:13.5px;">2025 PPM</span><span class="tag ok">Complete</span></div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ppm-hr" style="display:none;">
+      <div class="sect">Company PPMs · all 11 properties</div>
+      <div class="tiles">
+        <div class="tile"><div class="n" style="color:var(--ppm);">9</div><div class="l">Open</div></div>
+        <div class="tile"><div class="n">5</div><div class="l">Scheduled</div></div>
+        <div class="tile"><div class="n" style="color:var(--ok);">31</div><div class="l">Done</div></div>
+      </div>
+
+      <div class="sect">Needs attention <span class="cnt">2</span></div>
+      <div class="cardlist">
+        <div class="crow" onclick="toast('Record view (next slice)')">
+          <div class="r1"><span class="pstate half"></span><span class="who">An Nguyen</span><span class="tag warn">Closes in 3 days</span></div>
+          <div class="meta">Parkview · employee side outstanding</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+        <div class="crow" onclick="toast('Record view (next slice)')">
+          <div class="r1"><span class="pstate"></span><span class="who">Jun Park</span><span class="tag alert">Window closed · not started</span></div>
+          <div class="meta">Oakmont · supervisor: B. Slaymaker</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="sect">Windows opening</div>
+      <div class="seg-ctl" style="margin:0 16px 10px;">
+        <button class="on" onclick="setPpmWindow(this,45)">Next 45 days</button>
+        <button onclick="setPpmWindow(this,90)">Next 90 days</button>
+      </div>
+      <div class="cardlist" id="ppmwinlist">
+        <div class="crow" data-window="45" style="cursor:default;">
+          <div class="r1"><span class="who">Sarah Mitchell</span></div>
+          <div class="meta">Riverside · Window Aug 4 – Aug 18 · supervisor: J. Latiolais</div>
+          <div><button class="btn sm" onclick="remindSup(event,this)">Remind supervisor</button></div>
+        </div>
+        <div class="crow" data-window="45" style="cursor:default;">
+          <div class="r1"><span class="who">David Chen</span></div>
+          <div class="meta">Riverside · Window Aug 20 – Sep 3 · supervisor: B. Slaymaker</div>
+          <div><button class="btn sm" onclick="remindSup(event,this)">Remind supervisor</button></div>
+        </div>
+        <div class="crow" data-window="90" style="cursor:default;display:none;">
+          <div class="r1"><span class="who">Maria Ortiz</span></div>
+          <div class="meta">Elm Street · Window Sep 12 – Sep 26 · supervisor: K. Boyd</div>
+          <div><button class="btn sm" onclick="remindSup(event,this)">Remind supervisor</button></div>
+        </div>
+        <div class="crow" data-window="90" style="cursor:default;display:none;">
+          <div class="r1"><span class="who">Lena Freeman</span></div>
+          <div class="meta">Riverside · Window Oct 1 – Oct 15 · supervisor: C. Sosebee</div>
+          <div><button class="btn sm" onclick="remindSup(event,this)">Remind supervisor</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= NOTES ================= -->
+  <div class="screen" id="scr-notes">
+    <div class="apphead"><div class="brand">Notes</div><div class="spacer"></div><div class="avatar" onclick="go('me')">JL</div></div>
+
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></svg>
+      Notes are private to you. No one up or down the chain can see them.
+    </div>
+
+    <div class="pad" style="padding-bottom:0;">
+      <div class="fld">
+        <label>Employee</label>
+        <div class="chips" id="n-emp">
+          <button class="chip emp" onclick="pick(this,'n-emp')">Sarah Mitchell</button>
+          <button class="chip emp" onclick="pick(this,'n-emp')">Tom Reyes</button>
+          <button class="chip emp" onclick="pick(this,'n-emp')">Dana Carter</button>
+          <button class="chip" onclick="toast('Employee search (next slice)')">Search…</button>
+        </div>
+      </div>
+      <div class="fld">
+        <label>Core value</label>
+        <div class="chips" id="n-val">
+          <button class="chip" onclick="pick(this,'n-val')" title="Customers are Valuable">CV</button>
+          <button class="chip" onclick="pick(this,'n-val')" title="Work Should Enhance Life">WEL</button>
+          <button class="chip" onclick="pick(this,'n-val')" title="Be Professionals, Not Job Holders">PRO</button>
+          <button class="chip" onclick="pick(this,'n-val')" title="We Must Work Together">TOG</button>
+          <button class="chip" onclick="pick(this,'n-val')" title="Build Value">BV</button>
+        </div>
+      </div>
+      <div class="fld">
+        <label>Note</label>
+        <textarea id="n-text" placeholder="What did you observe?"></textarea>
+      </div>
+      <button class="btn pri" style="width:100%;margin-top:12px;" onclick="saveNote()">Save note</button>
+    </div>
+
+    <div class="sect" style="margin-top:22px;">Recent notes <span class="cnt" id="notecnt">2</span></div>
+    <div id="notelist">
+      <div class="notecard">
+        <div class="nr1"><span class="who">Sarah Mitchell</span><span class="vchip">PRO</span><span class="dt">Jul 12</span></div>
+        <div class="body">Handled the flooded unit on Elm herself — coordinated the vendor, stayed late, and kept the resident informed the whole way.</div>
+        <div class="nact"><button class="retire" onclick="retire(this)">Retire note</button></div>
+      </div>
+      <div class="notecard">
+        <div class="nr1"><span class="who">Tom Reyes</span><span class="vchip">TOG</span><span class="dt">Jul 8</span></div>
+        <div class="body">Coordinated with leasing on the unit-turn schedule without being asked — saved two days on the Riverside make-readies.</div>
+        <div class="nact"><button class="retire" onclick="retire(this)">Retire note</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ME ================= -->
+  <div class="screen" id="scr-me">
+    <div class="apphead"><div class="brand">Me</div><div class="spacer"></div><div class="avatar">JL</div></div>
+
+    <div class="pad" style="padding-bottom:2px;">
+      <div style="font-size:20px;font-weight:800;font-variation-settings:'wdth' 108;">Jamie Latiolais</div>
+      <div style="font-size:13px;color:var(--ink-3);margin-top:2px;">Information &amp; Systems Manager · Anniversary Mar 14</div>
+    </div>
+
+    <div class="sect">My current CVA</div>
+    <div class="herocard">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-weight:800;">2026 Annual CVA</span><span class="tag alert">Signature required</span>
+      </div>
+      <div class="herotrack"><div class="hstep done"><div class="hbar"></div><div class="hdot"></div><div class="hl">Started</div></div><div class="hstep done"><div class="hbar"></div><div class="hdot"></div><div class="hl">Reviewers</div></div><div class="hstep done"><div class="hbar"></div><div class="hdot"></div><div class="hl">HR</div></div><div class="hstep done"><div class="hbar"></div><div class="hdot"></div><div class="hl">Primary</div></div><div class="hstep cur"><div class="hbar"></div><div class="hdot"></div><div class="hl">Employee</div></div><div class="hstep"><div class="hbar"></div><div class="hdot"></div><div class="hl">Executive</div></div><div class="hstep"><div class="hbar"></div><div class="hdot"></div><div class="hl">Complete</div></div></div>
+      <button class="btn pri" style="width:100%;margin-top:12px;" onclick="openSignoff('CVA · Jamie Latiolais','Employee','With executive')">Review &amp; sign</button>
+    </div>
+
+    <div class="sect">My current PPM</div>
+    <div class="cardlist">
+      <div class="crow" onclick="openPpmForm('Jamie Latiolais','Employee')">
+        <div class="r1"><span class="pstate half"></span><span class="who">2026 Mid-cycle PPM</span></div>
+        <div class="meta">Your side due Aug 18 · supervisor side submitted</div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+    </div>
+
+    <div class="sect">History</div>
+    <div class="cardlist">
+      <div class="crow" onclick="toast('Archive PDF (mock)')">
+        <div class="r1"><span class="who" style="font-size:13.5px;">2025 CVA</span><span class="tag ok">Complete</span><span class="meta">PDF</span></div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+      <div class="crow" onclick="toast('Archive PDF (mock)')">
+        <div class="r1"><span class="who" style="font-size:13.5px;">2025 PPM</span><span class="tag ok">Complete</span></div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+      <div class="crow" onclick="toast('Archive PDF (mock)')">
+        <div class="r1"><span class="who" style="font-size:13.5px;">2024 CVA</span><span class="tag ok">Complete</span><span class="meta">PDF</span></div>
+        <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CVA FORM (pushed) ================= -->
+  <div class="screen" id="scr-cvaform">
+    <div class="apphead">
+      <button class="iconbtn" onclick="go('cva')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></button>
+      <div>
+        <div class="brand" id="cvaf-name" style="font-size:15px;">CVA</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+          <div class="microtrack" id="cvaf-micro" style="max-width:110px;"></div>
+          <span class="stagelabel" id="cvaf-stage" style="font-size:11px;"></span>
+        </div>
+      </div>
+    </div>
+    <div class="stepper" id="cvaf-stepper"></div>
+    <div class="pad" id="cvaf-body"></div>
+  </div>
+
+  <!-- ================= PPM FORM (pushed) ================= -->
+  <div class="screen" id="scr-ppmform">
+    <div class="apphead">
+      <button class="iconbtn" onclick="go('ppm')" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6l6 6"/></svg></button>
+      <div class="brand" id="ppmf-name" style="font-size:15px;">PPM</div>
+    </div>
+    <div class="seg-ctl" role="tablist" aria-label="Side">
+      <button class="on" id="ppmf-myside">Supervisor side</button>
+      <button id="ppmf-otherside" onclick="toast('Hidden until both sides submit')">Employee side</button>
+    </div>
+    <div class="stepper" id="ppmf-stepper"></div>
+    <div class="pad" id="ppmf-body"></div>
+  </div>
+
+  <!-- ================= TAB BAR ================= -->
+  <div class="tabbar">
+    <button id="tab-home" class="on" onclick="go('home')">
+      <span class="bdg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/></svg><span class="ndot"></span></span>
+      Home
+    </button>
+    <button id="tab-cva" onclick="go('cva')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/><path d="M9 3h6v4h-6z"/><path d="M9 14l2 2l4 -4"/></svg>
+      CVA
+    </button>
+    <button id="tab-ppm" onclick="go('ppm')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8M8 13h5"/><path d="M12 21a9 9 0 1 0 -9 -9c0 1.5 .4 3 1 4.3l-1 4.7l4.7 -1c1.3 .6 2.8 1 4.3 1z"/></svg>
+      PPM
+    </button>
+    <button id="tab-notes" onclick="go('notes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>
+      Notes
+    </button>
+    <button id="tab-me" onclick="go('me')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
+      Me
+    </button>
+  </div>
+
+  <!-- ================= QUICK NOTE SHEET ================= -->
+  <div class="scrim" id="scrim" onclick="closeAllSheets()"></div>
+  <div class="sheet" id="qsheet" role="dialog" aria-label="Quick note">
+    <div class="handle"></div>
+    <h3>Quick note
+      <button class="iconbtn x" onclick="closeSheet()" aria-label="Close" style="width:30px;height:30px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12M6 6l12 12"/></svg>
+      </button>
+    </h3>
+    <div class="fld">
+      <label>Employee</label>
+      <div class="chips" id="q-emp">
+        <button class="chip emp" onclick="pick(this,'q-emp')">Sarah Mitchell</button>
+        <button class="chip emp" onclick="pick(this,'q-emp')">Tom Reyes</button>
+        <button class="chip" onclick="toast('Employee search (next slice)')">Search…</button>
+      </div>
+    </div>
+    <div class="fld">
+      <label>Core value</label>
+      <div class="chips" id="q-val">
+        <button class="chip" onclick="pick(this,'q-val')" title="Customers are Valuable">CV</button>
+        <button class="chip" onclick="pick(this,'q-val')" title="Work Should Enhance Life">WEL</button>
+        <button class="chip" onclick="pick(this,'q-val')" title="Be Professionals, Not Job Holders">PRO</button>
+        <button class="chip" onclick="pick(this,'q-val')" title="We Must Work Together">TOG</button>
+        <button class="chip" onclick="pick(this,'q-val')" title="Build Value">BV</button>
+      </div>
+    </div>
+    <div class="fld">
+      <label>Note</label>
+      <textarea id="q-text" placeholder="What did you observe?"></textarea>
+    </div>
+    <button class="btn pri" style="width:100%;margin-top:14px;" onclick="saveQuick()">Save note</button>
+  </div>
+
+  <!-- ================= SIGN-OFF SHEET ================= -->
+  <div class="sheet" id="sosheet" role="dialog" aria-label="Sign off">
+    <div class="handle"></div>
+    <h3>Sign off
+      <button class="iconbtn x" onclick="closeAllSheets()" aria-label="Close" style="width:30px;height:30px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12M6 6l12 12"/></svg></button>
+    </h3>
+    <div class="so-meta">
+      <span id="so-title" style="font-weight:800;color:var(--ink);"></span>
+      <span>You are signing as <b id="so-role"></b></span>
+      <span>Stage after signing: <b id="so-stage"></b></span>
+    </div>
+    <div class="sigwrap">
+      <canvas id="sigcanvas"></canvas>
+      <div class="sighint" id="sighint">Sign with your finger</div>
+    </div>
+    <button class="btn sm" style="margin-top:8px;" onclick="clearSig()">Clear</button>
+    <label class="checkrow"><input type="checkbox" id="so-check">I confirm this record is complete and accurate to the best of my knowledge.</label>
+    <div class="formfoot">
+      <button class="btn" onclick="closeAllSheets()">Cancel</button>
+      <button class="btn pri" onclick="applySig()">Apply &amp; submit</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toastEl"></div>
+</div>
+
+<script>
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('scr-'+name).classList.add('on');
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('on'));
+  const t=document.getElementById('tab-'+name); if(t)t.classList.add('on');
+}
+function setHat(btn,hat){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('cva-mine').style.display = hat==='mine'?'block':'none';
+  document.getElementById('cva-team').style.display = hat==='team'?'block':'none';
+  document.getElementById('cva-hr').style.display   = hat==='hr'  ?'block':'none';
+}
+let aggSel=null;
+function aggFilter(seg,idx){
+  const was = seg.classList.contains('sel');
+  document.querySelectorAll('.aggseg').forEach(s=>s.classList.remove('sel'));
+  aggSel = was?null:idx;
+  if(!was) seg.classList.add('sel');
+  let shown=0;
+  document.querySelectorAll('#cvalist .crow').forEach(r=>{
+    const show = aggSel===null || +r.dataset.stage===aggSel;
+    r.style.display = show?'':'none';
+    if(show)shown++;
+  });
+  document.getElementById('activecnt').textContent=shown;
+}
+function pick(chip,groupId){
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('on'));
+  chip.classList.add('on');
+}
+function openSheet(){
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('qsheet').classList.add('on');
+}
+function closeSheet(){
+  document.getElementById('scrim').classList.remove('on');
+  document.getElementById('qsheet').classList.remove('on');
+}
+function saveQuick(){
+  const emp=document.querySelector('#q-emp .chip.on');
+  const val=document.querySelector('#q-val .chip.on');
+  const txt=document.getElementById('q-text').value.trim();
+  if(!emp||!val||!txt){toast('Pick an employee, a value, and add text');return;}
+  addNote(emp.textContent,val.textContent,txt);
+  document.getElementById('q-text').value='';
+  document.querySelectorAll('#q-emp .chip,#q-val .chip').forEach(c=>c.classList.remove('on'));
+  closeSheet();
+  toast('Note saved');
+}
+function saveNote(){
+  const emp=document.querySelector('#n-emp .chip.on');
+  const val=document.querySelector('#n-val .chip.on');
+  const txt=document.getElementById('n-text').value.trim();
+  if(!emp||!val||!txt){toast('Pick an employee, a value, and add text');return;}
+  addNote(emp.textContent,val.textContent,txt);
+  document.getElementById('n-text').value='';
+  document.querySelectorAll('#n-emp .chip,#n-val .chip').forEach(c=>c.classList.remove('on'));
+  toast('Note saved');
+}
+function addNote(who,val,txt){
+  const list=document.getElementById('notelist');
+  const card=document.createElement('div');
+  card.className='notecard';
+  card.innerHTML=`<div class="nr1"><span class="who"></span><span class="vchip"></span><span class="dt">Jul 14</span></div>
+    <div class="body"></div>
+    <div class="nact"><button class="retire" onclick="retire(this)">Retire note</button></div>`;
+  card.querySelector('.who').textContent=who;
+  card.querySelector('.vchip').textContent=val;
+  card.querySelector('.body').textContent=txt;
+  list.prepend(card);
+  const cnt=document.getElementById('notecnt');
+  cnt.textContent=+cnt.textContent+1;
+}
+function retire(btn){
+  const card=btn.closest('.notecard');
+  card.classList.add('retired');
+  btn.parentElement.innerHTML='<span class="retiredtag">Retired · kept for audit</span>';
+  toast('Note retired — retained, not deleted');
+}
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+/* ================= PUSHED SCREENS ================= */
+function pushScreen(scr,tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(scr).classList.add('on');
+  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('on'));
+  document.getElementById(tab).classList.add('on');
+}
+
+/* ================= PPM HAT ================= */
+function setPpmHat(btn,hat){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('ppm-mine').style.display=hat==='mine'?'block':'none';
+  document.getElementById('ppm-team').style.display=hat==='team'?'block':'none';
+  document.getElementById('ppm-hr').style.display=hat==='hr'?'block':'none';
+}
+
+/* ================= HR ANNIVERSARIES ================= */
+function setAnniv(btn,days){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#annivlist .crow').forEach(r=>{
+    r.style.display=(days===90||r.dataset.window==='45')?'':'none';
+  });
+  recountBatch();
+}
+function startAnniv(e,btn){
+  e.stopPropagation();
+  btn.parentElement.innerHTML='<span class="tag ok">&#10003; CVA started</span>';
+  recountBatch();
+  toast('CVA started — reviewers snapshotted at creation');
+}
+function startAllUnstarted(){
+  const btns=[...document.querySelectorAll('#annivlist .crow')]
+    .filter(r=>r.style.display!=='none')
+    .map(r=>r.querySelector('.startbtn')).filter(Boolean);
+  if(!btns.length){toast('Nothing to start in this window');return;}
+  btns.forEach(b=>{b.parentElement.innerHTML='<span class="tag ok">&#10003; CVA started</span>';});
+  recountBatch();
+  toast(btns.length+(btns.length===1?' CVA started':' CVAs started'));
+}
+function recountBatch(){
+  const n=[...document.querySelectorAll('#annivlist .crow')]
+    .filter(r=>r.style.display!=='none'&&r.querySelector('.startbtn')).length;
+  document.getElementById('batchstart').textContent =
+    n?('Start all unstarted ('+n+')'):'All CVAs in window started \u2713';
+}
+
+function setPpmWindow(btn,days){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#ppmwinlist .crow').forEach(r=>{
+    r.style.display=(days===90||r.dataset.window==='45')?'':'none';
+  });
+}
+function remindSup(e,btn){
+  e.stopPropagation();
+  btn.parentElement.innerHTML='<span class="tag ok">&#10003; Reminder sent</span>';
+  toast('Supervisor reminder sent (mock)');
+}
+
+/* ================= CVA FORM ================= */
+const CVA_STAGES=['Started','With reviewers','With HR','With primary','With employee','With executive','Complete'];
+const CORE_VALUES=[
+  {abbr:'CV', name:'Customers are Valuable', notes:2},
+  {abbr:'WEL',name:'Work Should Enhance Life', notes:1},
+  {abbr:'PRO',name:'Be Professionals, Not Job Holders', notes:4},
+  {abbr:'TOG',name:'We Must Work Together', notes:3},
+  {abbr:'BV', name:'Build Value', notes:1}
+];
+let cvaForm={name:'',role:'',stageIdx:3,step:0,ratings:['','','','',''],comments:['','','','','']};
+function openCvaForm(name,role,stageIdx){
+  cvaForm={name:name,role:role,stageIdx:stageIdx,step:0,ratings:['','','','',''],comments:['','','','','']};
+  document.getElementById('cvaf-name').textContent=name+' · CVA';
+  document.getElementById('cvaf-stage').textContent=CVA_STAGES[stageIdx];
+  const mt=document.getElementById('cvaf-micro');
+  mt.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=document.createElement('div');
+    d.className='seg'+(i<stageIdx?' done':i===stageIdx?' cur':'');
+    mt.appendChild(d);
+  }
+  renderCvaForm();
+  pushScreen('scr-cvaform','tab-cva');
+}
+function cvaGoto(i){cvaForm.step=i;renderCvaForm();}
+function renderCvaForm(){
+  const st=document.getElementById('cvaf-stepper');
+  st.innerHTML='';
+  for(let i=0;i<5;i++){
+    const b=document.createElement('button');
+    b.textContent=i+1;
+    if(i===cvaForm.step)b.className='on';
+    else if(cvaForm.ratings[i])b.className='donestep';
+    b.onclick=()=>cvaGoto(i);
+    st.appendChild(b);
+  }
+  const sb=document.createElement('button');
+  sb.textContent='Summary';sb.style.flex='1.7';
+  if(cvaForm.step===5)sb.className='on';
+  sb.onclick=()=>cvaGoto(5);
+  st.appendChild(sb);
+
+  const body=document.getElementById('cvaf-body');
+  if(cvaForm.step<5){
+    const i=cvaForm.step,v=CORE_VALUES[i];
+    body.innerHTML=
+      '<div class="sect" style="margin:2px 0 6px;">Value '+(i+1)+' of 5</div>'+
+      '<div style="font-size:17px;font-weight:800;font-variation-settings:\'wdth\' 108;">'+v.name+'</div>'+
+      '<div class="fld"><label>Rating</label><div class="ratepills" id="cvaf-pills"></div></div>'+
+      '<div class="fld"><label>Comments</label><textarea id="cvaf-cmt" placeholder="Ground your rating in what you observed."></textarea></div>'+
+      '<div class="aihint">'+
+        '<div class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>'+
+        v.notes+' of your notes tagged to this value<button class="btn sm" onclick="toast(\'Tagged notes (next slice)\')">View</button></div>'+
+        '<div class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3l5.8 1.9l-5.8 1.9a2 2 0 0 0 -1.3 1.3l-1.9 5.8l-1.9 -5.8a2 2 0 0 0 -1.3 -1.3l-5.8 -1.9l5.8 -1.9a2 2 0 0 0 1.3 -1.3z"/></svg>'+
+        'Draft comments from your notes<button class="btn sm" onclick="blendCva('+i+')">Blend</button></div>'+
+        '<div class="aicaption">AI drafts from your notes only. Ratings are always yours.</div>'+
+      '</div>'+
+      '<div class="formfoot">'+
+        '<button class="btn" '+(i===0?'disabled style="opacity:.4;"':'')+' onclick="cvaGoto('+(i-1)+')">&#9664; Prev</button>'+
+        '<button class="btn pri" onclick="cvaGoto('+(i+1)+')">'+(i===4?'Summary':'Next')+' &#9654;</button>'+
+      '</div>'+
+      '<div class="autosave">&#9679; <b>Autosaved</b> just now</div>';
+    const pills=document.getElementById('cvaf-pills');
+    const RATES=[['+','rp'],['+/-','rpm'],['-','rm']];
+    RATES.forEach(rr=>{
+      const p=document.createElement('button');
+      p.textContent=rr[0];
+      p.setAttribute('aria-pressed',cvaForm.ratings[i]===rr[0]);
+      p.className=cvaForm.ratings[i]===rr[0]?('on '+rr[1]):'';
+      p.onclick=()=>{cvaForm.ratings[i]=rr[0];renderCvaForm();};
+      pills.appendChild(p);
+    });
+    const ta=document.getElementById('cvaf-cmt');
+    ta.value=cvaForm.comments[i];
+    ta.oninput=()=>{cvaForm.comments[i]=ta.value;};
+  }else{
+    let rows='';
+    CORE_VALUES.forEach((v,i)=>{
+      rows+='<div class="sumrow"><span class="sv">'+v.name+'</span>'+
+        (cvaForm.ratings[i]
+          ?'<span class="sr '+(cvaForm.ratings[i]==='+'?'rp':cvaForm.ratings[i]==='+/-'?'rpm':'rm')+'">'+cvaForm.ratings[i]+'</span>'
+          :'<span class="sr miss">Not rated</span>')+
+      '</div>';
+    });
+    body.innerHTML=
+      '<div class="sect" style="margin:2px 0 6px;">Summary</div>'+
+      '<div class="cardlist" style="margin:0;padding:2px 14px;">'+rows+'</div>'+
+      '<button class="btn pri" style="width:100%;margin-top:16px;" onclick="cvaSignoff()">Sign off as '+cvaForm.role+'</button>'+
+      '<div class="autosave">&#9679; <b>Autosaved</b> just now</div>';
+  }
+}
+function blendCva(i){
+  const v=CORE_VALUES[i];
+  cvaForm.comments[i]=(cvaForm.comments[i]?cvaForm.comments[i]+'\n\n':'')+
+    '[Draft from '+v.notes+' tagged note'+(v.notes===1?'':'s')+'] Documented examples of "'+v.name+'" this cycle. Review and edit — this draft is a starting point, not a rating.';
+  renderCvaForm();
+  toast('Draft blended from your notes');
+}
+function cvaSignoff(){
+  if(cvaForm.ratings.some(r=>!r)){toast('Rate all five values before sign-off');return;}
+  openSignoff('CVA · '+cvaForm.name,cvaForm.role,CVA_STAGES[Math.min(cvaForm.stageIdx+1,6)]);
+}
+
+/* ================= PPM FORM ================= */
+const PPM_SECTIONS=['Wins since last review','Progress on goals','Support & development'];
+let ppmForm={name:'',role:'Supervisor',step:0,answers:['','','']};
+function openPpmForm(name,role){
+  ppmForm={name:name,role:role,step:0,answers:['','','']};
+  document.getElementById('ppmf-name').textContent=name+' · PPM';
+  document.getElementById('ppmf-myside').textContent=role+' side';
+  document.getElementById('ppmf-otherside').textContent=(role==='Supervisor'?'Employee':'Supervisor')+' side';
+  renderPpmForm();
+  pushScreen('scr-ppmform','tab-ppm');
+}
+function ppmGoto(i){ppmForm.step=i;renderPpmForm();}
+function renderPpmForm(){
+  const st=document.getElementById('ppmf-stepper');
+  st.innerHTML='';
+  for(let i=0;i<3;i++){
+    const b=document.createElement('button');
+    b.textContent=i+1;
+    if(i===ppmForm.step)b.className='on';
+    else if(ppmForm.answers[i].trim())b.className='donestep';
+    b.onclick=()=>ppmGoto(i);
+    st.appendChild(b);
+  }
+  const rb=document.createElement('button');
+  rb.textContent='Review';rb.style.flex='1.7';
+  if(ppmForm.step===3)rb.className='on';
+  rb.onclick=()=>ppmGoto(3);
+  st.appendChild(rb);
+
+  const body=document.getElementById('ppmf-body');
+  if(ppmForm.step<3){
+    const i=ppmForm.step;
+    body.innerHTML=
+      '<div class="sect" style="margin:2px 0 6px;">Section '+(i+1)+' of 3</div>'+
+      '<div style="font-size:17px;font-weight:800;font-variation-settings:\'wdth\' 108;">'+PPM_SECTIONS[i]+'</div>'+
+      '<div class="fld"><label>Your notes</label><textarea id="ppmf-ta" placeholder="Written from your side only."></textarea></div>'+
+      '<div class="aihint"><div class="ar">Sides stay hidden from each other until both submit.</div></div>'+
+      '<div class="formfoot">'+
+        '<button class="btn" '+(i===0?'disabled style="opacity:.4;"':'')+' onclick="ppmGoto('+(i-1)+')">&#9664; Prev</button>'+
+        '<button class="btn pri" onclick="ppmGoto('+(i+1)+')">'+(i===2?'Review':'Next')+' &#9654;</button>'+
+      '</div>'+
+      '<div class="autosave">&#9679; <b>Autosaved</b> just now</div>';
+    const ta=document.getElementById('ppmf-ta');
+    ta.value=ppmForm.answers[i];
+    ta.oninput=()=>{ppmForm.answers[i]=ta.value;};
+  }else{
+    let rows='';
+    PPM_SECTIONS.forEach((s,i)=>{
+      rows+='<div class="sumrow"><span class="sv">'+s+'</span>'+
+        (ppmForm.answers[i].trim()
+          ?'<span class="sr">Done</span>'
+          :'<span class="sr miss">Empty</span>')+
+      '</div>';
+    });
+    body.innerHTML=
+      '<div class="sect" style="margin:2px 0 6px;">Review</div>'+
+      '<div class="cardlist" style="margin:0;padding:2px 14px;">'+rows+'</div>'+
+      '<div class="aihint" style="margin-top:12px;"><div class="ar">Both sides become visible to each other after both submit.</div></div>'+
+      '<button class="btn pri" style="width:100%;margin-top:16px;" onclick="ppmSignoff()">Submit &amp; sign as '+ppmForm.role+'</button>'+
+      '<div class="autosave">&#9679; <b>Autosaved</b> just now</div>';
+  }
+}
+function ppmSignoff(){
+  if(ppmForm.answers.some(a=>!a.trim())){toast('Complete all three sections first');return;}
+  openSignoff('PPM · '+ppmForm.name,ppmForm.role,
+    ppmForm.role==='Supervisor'?'Awaiting employee side':'Awaiting supervisor sign-off');
+}
+
+/* ================= SIGN-OFF ================= */
+let sigInit=false,sigDrawn=false,sigCtx=null;
+function openSignoff(title,role,after){
+  document.getElementById('so-title').textContent=title;
+  document.getElementById('so-role').textContent=role;
+  document.getElementById('so-stage').textContent=after;
+  document.getElementById('so-check').checked=false;
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('sosheet').classList.add('on');
+  setTimeout(()=>{initSig();clearSig();},80);
+}
+function initSig(){
+  const c=document.getElementById('sigcanvas');
+  const r=c.getBoundingClientRect();
+  if(!r.width)return;
+  const dpr=window.devicePixelRatio||1;
+  c.width=Math.round(r.width*dpr);
+  c.height=Math.round(r.height*dpr);
+  sigCtx=c.getContext('2d');
+  sigCtx.scale(dpr,dpr);
+  sigCtx.lineWidth=2.2;sigCtx.lineCap='round';sigCtx.lineJoin='round';
+  sigCtx.strokeStyle='#16232e';
+  if(!sigInit){
+    let drawing=false;
+    const pos=e=>{const rr=c.getBoundingClientRect();return[e.clientX-rr.left,e.clientY-rr.top];};
+    c.addEventListener('pointerdown',e=>{
+      drawing=true;sigDrawn=true;
+      document.getElementById('sighint').style.display='none';
+      const p=pos(e);sigCtx.beginPath();sigCtx.moveTo(p[0],p[1]);
+      c.setPointerCapture(e.pointerId);
+    });
+    c.addEventListener('pointermove',e=>{
+      if(!drawing)return;
+      const p=pos(e);sigCtx.lineTo(p[0],p[1]);sigCtx.stroke();
+    });
+    c.addEventListener('pointerup',()=>{drawing=false;});
+    sigInit=true;
+  }
+}
+function clearSig(){
+  const c=document.getElementById('sigcanvas');
+  if(sigCtx)sigCtx.clearRect(0,0,c.width,c.height);
+  sigDrawn=false;
+  document.getElementById('sighint').style.display='flex';
+}
+function applySig(){
+  if(!sigDrawn){toast('Add your signature first');return;}
+  if(!document.getElementById('so-check').checked){toast('Confirm the statement to continue');return;}
+  const stage=document.getElementById('so-stage').textContent;
+  closeAllSheets();
+  toast('Signed — '+stage);
+}
+function closeAllSheets(){
+  document.getElementById('scrim').classList.remove('on');
+  document.getElementById('qsheet').classList.remove('on');
+  document.getElementById('sosheet').classList.remove('on');
+}
+</script>
+</body>
+</html>
