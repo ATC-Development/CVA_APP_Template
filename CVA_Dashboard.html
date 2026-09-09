@@ -500,6 +500,65 @@ table.hist tr:hover td{background:var(--card-2);}
   .row .due{display:none;}
   .tstep .tl{font-size:8.5px;}
 }
+
+/* ============================================================
+   READINESS / OBLIGATIONS  — added with the record expansion
+   ============================================================ */
+:root{
+  --oto:#5163b8; --oto-wash:#eaedfa;
+  --act:#a05a2c; --act-wash:#f8efe6;
+  --grw:#2e7d4f; --grw-wash:#e8f4ec;
+}
+@media(prefers-color-scheme:dark){
+  :root{ --oto:#8b9ae0; --oto-wash:#1a2044; --act:#d69457; --act-wash:#33210f; --grw:#5cba8a; --grw-wash:#122b1e; }
+}
+.tag.oto{background:var(--oto-wash); color:var(--oto);}
+.tag.act{background:var(--act-wash); color:var(--act);}
+.tag.grw{background:var(--grw-wash); color:var(--grw);}
+
+/* scope toggle */
+.scopetog{display:inline-flex; gap:3px; background:var(--card-2); border:1px solid var(--line); border-radius:8px; padding:2px;}
+.scopetog button{border:none; background:transparent; color:var(--ink-2); font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; cursor:pointer;}
+.scopetog button.on{background:var(--atc); color:#fff;}
+
+/* readiness table */
+.rdywrap{overflow-x:auto;}
+table.rdy{width:100%; border-collapse:collapse; font-size:12.5px; min-width:760px;}
+table.rdy th{text-align:left; padding:8px 12px; font-size:9.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-bottom:1px solid var(--line); white-space:nowrap;}
+table.rdy td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:middle; white-space:nowrap;}
+table.rdy tr:last-child td{border-bottom:none;}
+table.rdy tbody tr{cursor:pointer;}
+table.rdy tbody tr:hover td{background:var(--atc-wash);}
+table.rdy td.who{white-space:normal; min-width:170px;}
+table.rdy td.who .nm{font-weight:700;}
+table.rdy td.who .ti{font-size:11px; color:var(--ink-3);}
+table.rdy td.needs{white-space:normal; min-width:210px; font-size:12px;}
+.dayn{font-weight:800;}
+.dayn.g{color:var(--ok);} .dayn.a{color:var(--warn);} .dayn.r{color:var(--alert);}
+.subrow{font-size:10.5px; color:var(--ink-3); font-weight:600;}
+.needline{display:flex; align-items:center; gap:7px;}
+.needline .dotn{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.needline.r .dotn{background:var(--alert);} .needline.a .dotn{background:var(--warn);} .needline.g .dotn{background:var(--ok);}
+.needline.r{color:var(--alert); font-weight:700;} .needline.a{color:var(--warn); font-weight:700;} .needline.g{color:var(--ink-3);}
+
+/* obligations strip (Mine) */
+.oblig{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:0;}
+.oblig .ob{padding:14px 16px; border-right:1px solid var(--line);}
+.oblig .ob:last-child{border-right:none;}
+.oblig .ob .ol{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.oblig .ob .ov{font-size:20px; font-weight:900; margin-top:5px; font-variation-settings:'wdth' 98; line-height:1.15;}
+.oblig .ob .od{font-size:11px; color:var(--ink-3); font-weight:600; margin-top:3px;}
+.oblig .ob.hot .ov{color:var(--alert);}
+.oblig .ob.warm .ov{color:var(--warn);}
+@media(max-width:700px){ .oblig .ob{border-right:none; border-bottom:1px solid var(--line);} }
+
+/* rail screen links */
+.railnav{padding:0 12px 12px;}
+.railnav .lbl{font-size:9.5px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); padding:12px 8px 7px;}
+.railnav a{display:flex; align-items:center; gap:9px; padding:7px 9px; border-radius:8px; text-decoration:none; color:var(--ink-2); font-size:12.5px; font-weight:600;}
+.railnav a:hover{background:var(--card-2); color:var(--ink);}
+.railnav a .sw{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+.app.collapsed .railnav .lbl,.app.collapsed .railnav a span.t{display:none;}
 </style>
 </head>
 <body>
@@ -553,6 +612,18 @@ table.hist tr:hover td{background:var(--card-2);}
       </button>
     </div>
 
+    <div class="railnav">
+      <div class="lbl">Record screens</div>
+      <a href="Employee_Record.html"><span class="sw" style="background:var(--atc-deep)"></span><span class="t">Employee record</span></a>
+      <a href="OneOnOne_Screens.html"><span class="sw" style="background:var(--oto)"></span><span class="t">One-on-ones</span></a>
+      <a href="Action_Items.html"><span class="sw" style="background:var(--act)"></span><span class="t">Action items &amp; growth</span></a>
+      <div class="lbl">Assessment forms</div>
+      <a href="CVA_Form_Screens.html"><span class="sw" style="background:var(--atc)"></span><span class="t">CVA form</span></a>
+      <a href="PPM_Form_Screens.html"><span class="sw" style="background:var(--ppm)"></span><span class="t">PPM form</span></a>
+      <a href="CVA_Mobile.html"><span class="sw" style="background:var(--ink-3)"></span><span class="t">Mobile PWA</span></a>
+      <a href="index.html"><span class="sw" style="background:var(--ink-3)"></span><span class="t">All prototypes</span></a>
+    </div>
+
     <div class="rail-foot">
       <div class="lbl">Mockup — simulate role</div>
       <select id="rolesim" onchange="simRole(this.value)">
@@ -584,6 +655,23 @@ table.hist tr:hover td{background:var(--card-2);}
             <div class="bd">Your 2026 CVA is ready for your review and acknowledgment.</div>
           </div>
           <button class="go">Review &amp; sign</button>
+        </div>
+
+        <!-- WHAT YOU OWE / WHAT IS NEXT — cross-record obligations -->
+        <div class="card">
+          <div class="chead">
+            <span class="ct">What you owe &amp; what's next</span>
+            <span class="spacer"></span>
+            <a class="btn ghost sm" href="Employee_Record.html" style="text-decoration:none;">Open my full record →</a>
+          </div>
+          <div class="oblig" id="myOblig"></div>
+          <div class="cbody" style="border-top:1px solid var(--line);">
+            <div class="rows" id="myActions"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+              <a class="btn sm" href="Action_Items.html" style="text-decoration:none;">All my action items →</a>
+              <a class="btn sm pri" href="Action_Items.html" style="text-decoration:none;">Raise a growth request</a>
+            </div>
+          </div>
         </div>
 
         <!-- YOUR CVA — hero stage track -->
@@ -710,6 +798,27 @@ table.hist tr:hover td{background:var(--card-2);}
           <div class="eyebrow">Supervisory</div>
           <h2>My Team</h2>
           <div class="desc">Everyone in your subordinate tree, their assessment stages, and your year-round observation log.</div>
+        </div>
+
+        <!-- TEAM READINESS — one row per person, every record type -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="chead">
+            <span class="ct">Team readiness</span>
+            <span class="spacer"></span>
+            <span class="scopetog" id="scopeTog">
+              <button class="on" onclick="setScope('direct')">Direct reports</button>
+              <button onclick="setScope('all')">All reports (chain)</button>
+            </span>
+            <button class="btn ghost sm" onclick="openTree()">Org hierarchy →</button>
+          </div>
+          <div class="rdywrap">
+            <table class="rdy" id="rdyTbl"></table>
+          </div>
+          <div class="cbody" style="border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3);line-height:1.55;">
+            One row per person, every record type. <b>Needs</b> is the single most urgent thing outstanding — it is derived, not entered.
+            Scope is resolved from Graph <code>transitiveReports</code>, so the chain above sees the same table one level wider.
+            Click any row to open that person's full record.
+          </div>
         </div>
 
         <div class="split">
@@ -871,6 +980,34 @@ table.hist tr:hover td{background:var(--card-2);}
         </div>
 
         <!-- aggregate stage track -->
+        <!-- PROGRAM COVERAGE — cross-record, by property -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="chead">
+            <span class="ct">Program coverage — by property</span>
+            <span class="spacer"></span>
+            <span class="tag mut">11 properties</span>
+            <a class="btn ghost sm" href="Action_Items.html" style="text-decoration:none;">Growth request queue →</a>
+          </div>
+          <div class="rdywrap">
+            <table class="rdy" id="hrCovTbl"></table>
+          </div>
+          <div class="cbody" style="border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3);line-height:1.55;">
+            PPM columns count <b>completed</b> PPMs only — HR has no visibility into a PPM before Complete, so in-flight PPMs are absent from this table by rule, not by filter.
+          </div>
+        </div>
+
+        <!-- EXCEPTIONS — people the program has lost track of -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="chead">
+            <span class="ct">Exceptions — no contact on record</span>
+            <span class="spacer"></span>
+            <span class="pill">5</span>
+          </div>
+          <div class="rdywrap">
+            <table class="rdy" id="hrExcTbl"></table>
+          </div>
+        </div>
+
         <div class="card">
           <div class="chead">
             <span class="ct">CVA pipeline — company-wide</span>
@@ -1502,6 +1639,134 @@ function openAssign(name, due){
 
 /* off-cycle */
 function openOffCycle(){ openM('ov-offcycle'); }
+
+/* ============================================================
+   READINESS DATA & RENDER — added with the record expansion
+   Every figure below is derived from the owning aggregate; the
+   dashboard never stores it.
+   ============================================================ */
+const RDY_DIRECT=[
+ {i:'AF',n:'Abigail Florence',t:'Leasing Agent · Riverbend',
+  oto:{d:'Aug 21',days:18}, ppm:{s:'Your side pending',tone:'a'}, cva:{s:'With reviewers',due:'Jul 22',tone:'a'},
+  act:{open:3,over:0}, grw:{open:1,breach:false},
+  need:['a','Your PPM side is pending — Abigail has submitted hers']},
+ {i:'BR',n:'Billy Riden',t:'Maintenance Tech · Riverbend',
+  oto:{d:'Mar 24',days:168}, ppm:{s:'Ready to consolidate',tone:'a'}, cva:{s:'With HR',due:'Sep 26',tone:'g'},
+  act:{open:1,over:1}, grw:{open:1,breach:true},
+  need:['r','No one-on-one in 168 days · growth request unanswered 22 days']},
+ {i:'BS',n:'Bobo Rushton',t:'Groundskeeper · Oakline',
+  oto:{d:'Aug 6',days:33}, ppm:{s:'Not due',tone:'g'}, cva:{s:'Not started',due:'Feb 23',tone:'g'},
+  act:{open:0,over:0}, grw:{open:0,breach:false},
+  need:['g','Nothing outstanding']},
+ {i:'CT',n:'Carl Thomas',t:'Property Manager · Oakline',
+  oto:{d:'Jul 30',days:40}, ppm:{s:'Complete Aug 13',tone:'g'}, cva:{s:'Complete',due:'Oct 15',tone:'g'},
+  act:{open:4,over:1}, grw:{open:0,breach:false},
+  need:['a','One action item overdue 6 days — Q3 turnover report']}
+];
+const RDY_EXTRA=[
+ {i:'DK',n:'Dana Kessler',t:'Leasing Agent · Oakline · under Carl',
+  oto:{d:'Sep 2',days:6}, ppm:{s:'Not due',tone:'g'}, cva:{s:'Not started',due:'Dec 4',tone:'g'},
+  act:{open:2,over:0}, grw:{open:0,breach:false}, need:['g','Nothing outstanding']},
+ {i:'LF',n:'Luis Ferrer',t:'Maintenance Tech · Oakline · under Carl',
+  oto:{d:'—',days:null}, ppm:{s:'Not due',tone:'g'}, cva:{s:'Not started',due:'Nov 9',tone:'g'},
+  act:{open:0,over:0}, grw:{open:1,breach:true},
+  need:['r','No one-on-one ever recorded · training request unanswered 9 days']},
+ {i:'RC',n:'Renata Cole',t:'Assistant Manager · Oakline · under Carl',
+  oto:{d:'Jun 18',days:83}, ppm:{s:'Complete Jul 2',tone:'g'}, cva:{s:'With primary',due:'Mar 30',tone:'a'},
+  act:{open:2,over:0}, grw:{open:1,breach:true},
+  need:['r','Assistant Manager request unanswered 22 days']}
+];
+let RDY_SCOPE='direct';
+
+const dayCls=d=>d===null?'r':d>90?'r':d>60?'a':'g';
+function rdyRow(r){
+  return `<tr onclick="location.href='Employee_Record.html'">
+    <td class="who"><div class="nm">${r.n}</div><div class="ti">${r.t}</div></td>
+    <td><div class="dayn ${dayCls(r.oto.days)}">${r.oto.days===null?'never':r.oto.days+'d'}</div><div class="subrow">${r.oto.d}</div></td>
+    <td><span class="tag ${r.ppm.tone==='a'?'warn':r.ppm.tone==='r'?'alert':'mut'}">${r.ppm.s}</span></td>
+    <td><div style="font-weight:700">${r.cva.s}</div><div class="subrow">anniversary ${r.cva.due}</div></td>
+    <td>${r.act.open?`<b>${r.act.open}</b> open`:'<span style="color:var(--ink-3)">none</span>'}${r.act.over?` <span class="tag alert">${r.act.over} overdue</span>`:''}</td>
+    <td>${r.grw.open?`<span class="tag ${r.grw.breach?'alert':'grw'}">${r.grw.open} open${r.grw.breach?' · SLA':''}</span>`:'<span style="color:var(--ink-3)">—</span>'}</td>
+    <td class="needs"><div class="needline ${r.need[0]}"><span class="dotn"></span><span>${r.need[1]}</span></div></td>
+  </tr>`;
+}
+function renderRdy(){
+  const rows = RDY_SCOPE==='all' ? RDY_DIRECT.concat(RDY_EXTRA) : RDY_DIRECT;
+  const order={r:0,a:1,g:2};
+  rows.sort((x,y)=>order[x.need[0]]-order[y.need[0]]);
+  const el=document.getElementById('rdyTbl'); if(!el) return;
+  el.innerHTML =
+    `<thead><tr><th>Employee</th><th>Last 1:1</th><th>PPM</th><th>CVA</th><th>Action items</th><th>Growth</th><th>Needs</th></tr></thead>`+
+    `<tbody>${rows.map(rdyRow).join('')}</tbody>`;
+}
+function setScope(v){
+  RDY_SCOPE=v;
+  document.querySelectorAll('#scopeTog button').forEach((b,i)=>b.classList.toggle('on', (i===0)===(v==='direct')));
+  renderRdy();
+}
+
+/* ---- Mine: obligations strip + open action items ---- */
+const MY_OBLIG=[
+ {l:'Your CVA',        v:'With you',   d:'sign-off due Jul 18',        cls:'hot'},
+ {l:'Your PPM',        v:'Feb 2027',   d:'next mid-cycle window',      cls:''},
+ {l:'Last one-on-one', v:'22 days',    d:'Aug 18 with Caroline',       cls:''},
+ {l:'Open actions',    v:'3',          d:'1 overdue',                  cls:'warm'},
+ {l:'Growth requests', v:'1',          d:'acknowledged, awaiting decision', cls:''}
+];
+const MY_ACTIONS=[
+ {t:'Publish the Q3 systems review to Caroline', src:'One-on-one · Aug 18', due:'Sep 5', over:true},
+ {t:'Finish the Intune compliance baseline rollout', src:'PPM · Feb 2026 · Focus', due:'Sep 30', over:false},
+ {t:'Draft the CVA rebuild phase 1 scope for Caroline', src:'CVA 2026 follow-up', due:'Oct 14', over:false}
+];
+function renderMine(){
+  const o=document.getElementById('myOblig'); if(!o) return;
+  o.innerHTML = MY_OBLIG.map(x=>`<div class="ob ${x.cls}"><div class="ol">${x.l}</div><div class="ov">${x.v}</div><div class="od">${x.d}</div></div>`).join('');
+  document.getElementById('myActions').innerHTML = MY_ACTIONS.map(a=>`
+    <div class="row" style="cursor:pointer" onclick="location.href='Action_Items.html'">
+      <div class="id"><div class="nm">${a.t}</div><div class="ti">${a.src}</div></div>
+      <span class="tag ${a.over?'alert':'mut'}">${a.over?'Overdue · due '+a.due:'Due '+a.due}</span>
+    </div>`).join('');
+}
+
+/* ---- HR: coverage + exceptions ---- */
+const HR_COV=[
+ {p:'Riverbend',    m:'Maria Gonzales',  st:6,  oto:'83%', med:47,  ppm:'5 of 6', cva:'2 in flight', act:14, over:2, grw:2, tone:'a'},
+ {p:'Oakline',      m:'Carl Thomas',     st:7,  oto:'57%', med:83,  ppm:'4 of 7', cva:'1 in flight', act:11, over:3, grw:3, tone:'r'},
+ {p:'Cypress Walk', m:'Dana Whitfield',  st:8,  oto:'100%',med:31,  ppm:'8 of 8', cva:'3 in flight', act:19, over:0, grw:1, tone:'g'},
+ {p:'Stonebridge',  m:'Kevin Marsh',     st:5,  oto:'40%', med:94,  ppm:'2 of 5', cva:'0 in flight', act:6,  over:4, grw:2, tone:'r'},
+ {p:'Laurel Point', m:'Priya Raman',     st:7,  oto:'100%',med:28,  ppm:'7 of 7', cva:'2 in flight', act:16, over:1, grw:1, tone:'g'}
+];
+const HR_EXC=[
+ {n:'Luis Ferrer',   p:'Oakline',     m:'Carl Thomas',    why:'No one-on-one ever recorded · hired 14 months ago', sev:'r'},
+ {n:'Billy Riden',   p:'Riverbend',   m:'Maria Gonzales', why:'168 days since last one-on-one · growth request unanswered 22 days', sev:'r'},
+ {n:'Renata Cole',   p:'Oakline',     m:'Carl Thomas',    why:'Assistant Manager request unanswered 22 days · SLA breached', sev:'r'},
+ {n:'Marcus Webb',   p:'Cypress Walk',m:'Dana Whitfield', why:'CVA complete 11 months ago, no PPM and no one-on-one since', sev:'a'},
+ {n:'Tasha Bell',    p:'Stonebridge', m:'Kevin Marsh',    why:'4 action items overdue, oldest 61 days', sev:'a'}
+];
+function renderHR(){
+  const c=document.getElementById('hrCovTbl'); if(!c) return;
+  c.innerHTML =
+    `<thead><tr><th>Property</th><th>Manager</th><th>Staff</th><th>1:1 coverage 90d</th><th>Median days</th><th>PPM complete</th><th>CVA</th><th>Actions</th><th>Growth open</th></tr></thead><tbody>`+
+    HR_COV.map(r=>`<tr onclick="location.href='Employee_Record.html'">
+      <td class="who"><div class="nm">${r.p}</div></td>
+      <td>${r.m}</td><td>${r.st}</td>
+      <td><span class="dayn ${parseInt(r.oto)<60?'r':parseInt(r.oto)<90?'a':'g'}">${r.oto}</span></td>
+      <td><span class="dayn ${dayCls(r.med)}">${r.med}d</span></td>
+      <td>${r.ppm}</td><td>${r.cva}</td>
+      <td>${r.act}${r.over?` <span class="tag alert">${r.over} overdue</span>`:''}</td>
+      <td>${r.grw?`<span class="tag grw">${r.grw}</span>`:'—'}</td>
+    </tr>`).join('')+`</tbody>`;
+
+  document.getElementById('hrExcTbl').innerHTML =
+    `<thead><tr><th>Employee</th><th>Property</th><th>Supervisor</th><th>Why it is an exception</th></tr></thead><tbody>`+
+    HR_EXC.map(r=>`<tr onclick="location.href='Employee_Record.html'">
+      <td class="who"><div class="nm">${r.n}</div></td><td>${r.p}</td><td>${r.m}</td>
+      <td class="needs"><div class="needline ${r.sev}"><span class="dotn"></span><span>${r.why}</span></div></td>
+    </tr>`).join('')+`</tbody>`;
+}
+
+renderRdy(); renderMine(); renderHR();
+
 </script>
 </body>
 </html>

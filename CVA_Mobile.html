@@ -391,6 +391,60 @@ body{
 @media(prefers-reduced-motion:reduce){
   .sheet,.scrim,.toast{transition:none;}
 }
+
+/* ============================================================
+   RECORD EXPANSION — people readiness, actions, growth
+   ============================================================ */
+:root{ --oto:#5163b8; --oto-wash:#eaedfa; --act:#a05a2c; --act-wash:#f8efe6; --grw:#2e7d4f; --grw-wash:#e8f4ec; }
+@media(prefers-color-scheme:dark){
+  :root{ --oto:#8b9ae0; --oto-wash:#1a2044; --act:#d69457; --act-wash:#33210f; --grw:#5cba8a; --grw-wash:#122b1e; }
+}
+.tag.oto{background:var(--oto-wash);color:var(--oto);}
+.tag.act{background:var(--act-wash);color:var(--act);}
+.tag.grw{background:var(--grw-wash);color:var(--grw);}
+
+/* person readiness row */
+.prow{display:block;padding:13px 16px;border-bottom:1px solid var(--line);position:relative;}
+.prow:last-child{border-bottom:none;}
+.prow:active{background:var(--card-2);}
+.prow .p1{display:flex;align-items:baseline;gap:8px;}
+.prow .pn{font-weight:700;font-size:14.5px;}
+.prow .pt{font-size:11.5px;color:var(--ink-3);margin-top:1px;}
+.prow .need{display:flex;align-items:flex-start;gap:7px;margin-top:7px;font-size:12.5px;line-height:1.4;}
+.prow .need .dotn{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.prow .need.r{color:var(--alert);font-weight:700;} .prow .need.r .dotn{background:var(--alert);}
+.prow .need.a{color:var(--warn);font-weight:700;} .prow .need.a .dotn{background:var(--warn);}
+.prow .need.g{color:var(--ink-3);} .prow .need.g .dotn{background:var(--ok);}
+.prow .pchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+.pchip{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--card-2);border:1px solid var(--line);color:var(--ink-2);white-space:nowrap;}
+.pchip b{font-variation-settings:'wdth' 96;}
+.pchip.r{background:var(--alert-wash);border-color:transparent;color:var(--alert);}
+.pchip.a{background:var(--warn-wash);border-color:transparent;color:var(--warn);}
+.pchip.g{background:var(--ok-wash);border-color:transparent;color:var(--ok);}
+
+/* stat grid used in the person sheet + home */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.sbox{background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+.sbox .sl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);}
+.sbox .sv{font-size:16px;font-weight:800;margin-top:3px;font-variation-settings:'wdth' 100;}
+.sbox .sd{font-size:10.5px;color:var(--ink-3);margin-top:1px;}
+.sbox.r .sv{color:var(--alert);} .sbox.a .sv{color:var(--warn);}
+
+/* action item row */
+.arow{display:flex;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:flex-start;}
+.arow:last-child{border-bottom:none;}
+.arow:active{background:var(--card-2);}
+.arow .abox{width:19px;height:19px;border-radius:6px;border:1.8px solid var(--line-strong);flex-shrink:0;margin-top:1px;display:grid;place-items:center;font-size:11px;font-weight:900;color:#fff;}
+.arow.done .abox{background:var(--ok);border-color:var(--ok);}
+.arow.done .at{text-decoration:line-through;color:var(--ink-3);}
+.arow .at{font-size:13.5px;font-weight:600;line-height:1.4;}
+.arow .am{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;align-items:center;}
+.boards{display:flex;gap:8px;margin:0 16px 4px;}
+.boards button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 8px;font-family:inherit;font-size:12px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:6px;}
+.boards button:active{background:var(--card-2);}
+.boards button .sw{width:7px;height:7px;border-radius:2px;}
+.needbar{margin:0 16px 12px;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:600;line-height:1.45;display:flex;gap:8px;align-items:flex-start;background:var(--alert-wash);color:var(--alert);}
+.needbar svg{width:15px;height:15px;flex-shrink:0;margin-top:1px;}
 </style>
 </head>
 <body>
@@ -399,7 +453,7 @@ body{
   <!-- ================= HOME ================= -->
   <div class="screen on" id="scr-home">
     <div class="apphead">
-      <div class="brand">ATC · <b>CVA</b></div>
+      <div class="brand">ATC · <b>Record</b></div>
       <div class="spacer"></div>
       <button class="iconbtn" onclick="toast('Notifications (mock)')" aria-label="Notifications">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></svg>
@@ -452,6 +506,12 @@ body{
       </div>
     </div>
 
+    <div class="sect">Your commitments <span class="cnt">3</span></div>
+    <div class="cardlist" id="homeActions"></div>
+
+    <div class="sect">Your team needs <span class="cnt">2</span></div>
+    <div class="cardlist" id="homeNeeds"></div>
+
     <div class="sect">Coming up</div>
     <div class="cardlist">
       <div class="crow" onclick="go('cva')">
@@ -464,6 +524,65 @@ body{
         <div class="meta">Sarah Mitchell · window Aug 4 – Aug 18</div>
         <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= PEOPLE ================= -->
+  <div class="screen" id="scr-people">
+    <div class="apphead">
+      <div class="brand">People</div>
+      <div class="spacer"></div>
+      <button class="iconbtn" onclick="openSheet()" aria-label="Quick note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>
+      </button>
+      <div class="avatar" onclick="go('me')">JL</div>
+    </div>
+
+    <div class="seg-ctl" id="peopleHat">
+      <button class="on" onclick="setPeople(this,'direct')">My Team</button>
+      <button onclick="setPeople(this,'all')">All reports</button>
+      <button onclick="setPeople(this,'hr')">HR Ops</button>
+    </div>
+
+    <div class="boards">
+      <button onclick="go('cva')"><span class="sw" style="background:var(--atc)"></span>CVA board</button>
+      <button onclick="go('ppm')"><span class="sw" style="background:var(--ppm)"></span>PPM board</button>
+    </div>
+
+    <div class="needbar" id="peopleBar"></div>
+
+    <div class="sect">Readiness <span class="cnt" id="peopleCnt">4</span></div>
+    <div class="cardlist" id="peopleList"></div>
+
+    <div class="privacy-note" style="margin-top:14px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5 -3.5 8 -8 9c-4.5 -1 -8 -4 -8 -9v-5z"/></svg>
+      One row per person, every record type. Scope resolves from Graph transitive reports — the chain above sees the same list, one level wider.
+    </div>
+  </div>
+
+  <!-- ================= ACTIONS ================= -->
+  <div class="screen" id="scr-actions">
+    <div class="apphead">
+      <div class="brand">Actions</div>
+      <div class="spacer"></div>
+      <div class="avatar" onclick="go('me')">JL</div>
+    </div>
+
+    <div class="seg-ctl" id="actHat">
+      <button class="on" onclick="setActs(this,'mine')">Mine</button>
+      <button onclick="setActs(this,'team')">My Team</button>
+      <button onclick="setActs(this,'grw')">Growth</button>
+    </div>
+
+    <div id="actBody"></div>
+
+    <button class="btn pri block" onclick="openGrwSheet()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Raise a growth request
+    </button>
+    <div class="privacy-note" style="margin-top:14px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg>
+      Every item shows the record that created it. Nothing here is hidden from the person who owns it.
     </div>
   </div>
 
@@ -882,13 +1001,13 @@ body{
       <span class="bdg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/></svg><span class="ndot"></span></span>
       Home
     </button>
-    <button id="tab-cva" onclick="go('cva')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/><path d="M9 3h6v4h-6z"/><path d="M9 14l2 2l4 -4"/></svg>
-      CVA
+    <button id="tab-people" onclick="go('people')">
+      <span class="bdg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></svg><span class="ndot"></span></span>
+      People
     </button>
-    <button id="tab-ppm" onclick="go('ppm')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8M8 13h5"/><path d="M12 21a9 9 0 1 0 -9 -9c0 1.5 .4 3 1 4.3l-1 4.7l4.7 -1c1.3 .6 2.8 1 4.3 1z"/></svg>
-      PPM
+    <button id="tab-actions" onclick="go('actions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3l8 -8"/><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9"/></svg>
+      Actions
     </button>
     <button id="tab-notes" onclick="go('notes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>
@@ -898,6 +1017,41 @@ body{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
       Me
     </button>
+  </div>
+
+  <!-- ================= PERSON SHEET ================= -->
+  <div class="sheet" id="psheet" role="dialog" aria-label="Person detail">
+    <div class="handle"></div>
+    <h3><span id="ps-name">Employee</span><button class="iconbtn x" onclick="closeAllSheets()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12M6 6l12 12"/></svg></button></h3>
+    <div class="pad" style="padding-top:0;" id="ps-body"></div>
+  </div>
+
+  <!-- ================= GROWTH REQUEST SHEET ================= -->
+  <div class="sheet" id="gsheet" role="dialog" aria-label="Raise a growth request">
+    <div class="handle"></div>
+    <h3>Raise a growth request<button class="iconbtn x" onclick="closeAllSheets()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12M6 6l12 12"/></svg></button></h3>
+    <div class="pad" style="padding-top:0;">
+      <div class="fld">
+        <label>Type</label>
+        <div class="chips" id="g-type">
+          <button class="chip on" onclick="pick(this,'g-type')">Career path</button>
+          <button class="chip" onclick="pick(this,'g-type')">Training</button>
+          <button class="chip" onclick="pick(this,'g-type')">New skill</button>
+          <button class="chip" onclick="pick(this,'g-type')">Mentorship</button>
+        </div>
+      </div>
+      <div class="fld">
+        <label>What are you asking for</label>
+        <textarea id="g-text" placeholder="Your words go on the record unedited. Neither your supervisor nor HR can alter this text."></textarea>
+      </div>
+      <div class="privacy-note" style="margin:4px 0 0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 3"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/></svg>
+        Routed to Caroline Sosebee. Acknowledgment owed within 5 business days, then it escalates.
+      </div>
+      <button class="btn pri" style="width:100%;margin-top:12px;" onclick="submitGrowth()">Submit request</button>
+    </div>
   </div>
 
   <!-- ================= QUICK NOTE SHEET ================= -->
@@ -965,7 +1119,8 @@ function go(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById('scr-'+name).classList.add('on');
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('on'));
-  const t=document.getElementById('tab-'+name); if(t)t.classList.add('on');
+  const map={cva:'people',ppm:'people',cvaform:'people',ppmform:'people'};
+  const t=document.getElementById('tab-'+(map[name]||name)); if(t)t.classList.add('on');
 }
 function setHat(btn,hat){
   btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
@@ -1337,7 +1492,210 @@ function closeAllSheets(){
   document.getElementById('scrim').classList.remove('on');
   document.getElementById('qsheet').classList.remove('on');
   document.getElementById('sosheet').classList.remove('on');
+  const ps=document.getElementById('psheet'); if(ps) ps.classList.remove('on');
+  const gs=document.getElementById('gsheet'); if(gs) gs.classList.remove('on');
 }
+
+/* ============================================================
+   RECORD EXPANSION — people readiness, actions, growth
+   ============================================================ */
+const PEOPLE_DIRECT=[
+ {i:'SM',n:'Sarah Mitchell',t:'Property Manager · Riverbend',
+  oto:{d:'Jun 12',days:32}, ppm:'Window opens Aug 4', cva:'Not started · Jul 30',
+  act:{open:3,over:0}, grw:0, need:['a','PPM window opens in 21 days · no draft started']},
+ {i:'TR',n:'Tom Reyes',t:'Maintenance Supervisor · Oakline',
+  oto:{d:'Jan 28',days:167}, ppm:'Complete Mar 4', cva:'Not started · Aug 12',
+  act:{open:2,over:1}, grw:1, need:['r','No one-on-one in 167 days · growth request unanswered 14 days']},
+ {i:'DC',n:'Dana Carter',t:'Leasing Agent · Riverbend',
+  oto:{d:'Jul 2',days:12}, ppm:'Complete May 19', cva:'With reviewers · Apr 3',
+  act:{open:1,over:0}, grw:0, need:['g','Nothing outstanding']},
+ {i:'BS',n:'Barry Slaymaker',t:'Area Manager',
+  oto:{d:'Jun 30',days:14}, ppm:'Not due', cva:'With primary · Jul 21',
+  act:{open:4,over:0}, grw:0, need:['a','You are Primary — final combine due Jul 21']}
+];
+const PEOPLE_EXTRA=[
+ {i:'MJ',n:'Meg Johnson',t:'HR · under Barry',
+  oto:{d:'May 6',days:69}, ppm:'Ready to sign', cva:'Complete',
+  act:{open:1,over:0}, grw:0, need:['a','PPM awaiting your sign-off']},
+ {i:'LF',n:'Luis Ferrer',t:'Maintenance Tech · Oakline · under Tom',
+  oto:{d:'—',days:null}, ppm:'Not due', cva:'Not started · Nov 9',
+  act:{open:0,over:0}, grw:1, need:['r','No one-on-one ever recorded · hired 14 months ago']},
+ {i:'RC',n:'Renata Cole',t:'Assistant Manager · Oakline · under Tom',
+  oto:{d:'Apr 18',days:87}, ppm:'Complete Jul 2', cva:'With primary · Mar 30',
+  act:{open:2,over:0}, grw:1, need:['r','Assistant Manager request unanswered 22 days']}
+];
+const PEOPLE_HR=[
+ {i:'LF',n:'Luis Ferrer',t:'Oakline · supervisor Tom Reyes',
+  oto:{d:'—',days:null}, ppm:'Not due', cva:'Not started',
+  act:{open:0,over:0}, grw:1, need:['r','No one-on-one ever recorded']},
+ {i:'TR',n:'Tom Reyes',t:'Oakline · supervisor Barry Slaymaker',
+  oto:{d:'Jan 28',days:167}, ppm:'Complete', cva:'Not started',
+  act:{open:2,over:1}, grw:1, need:['r','167 days since last one-on-one']},
+ {i:'RC',n:'Renata Cole',t:'Oakline · supervisor Tom Reyes',
+  oto:{d:'Apr 18',days:87}, ppm:'Complete', cva:'With primary',
+  act:{open:2,over:0}, grw:1, need:['r','Growth request SLA breached · 22 days']},
+ {i:'MW',n:'Marcus Webb',t:'Cypress Walk · supervisor Dana Whitfield',
+  oto:{d:'Sep 9',days:308}, ppm:'None on record', cva:'Complete',
+  act:{open:0,over:0}, grw:0, need:['a','CVA complete 11 months ago, nothing since']},
+ {i:'TB',n:'Tasha Bell',t:'Stonebridge · supervisor Kevin Marsh',
+  oto:{d:'Jun 2',days:42}, ppm:'Complete', cva:'Not started',
+  act:{open:4,over:4}, grw:0, need:['a','4 action items overdue, oldest 61 days']}
+];
+const PEOPLE_BAR={
+  direct:'1 person has had no one-on-one in over 90 days.',
+  all:'3 people are past the one-on-one window; 1 has none on record at all.',
+  hr:'5 exceptions across 11 properties. Two growth requests have breached the 5-day acknowledgment SLA.'
+};
+let PSCOPE='direct';
+
+function pset(){ return PSCOPE==='hr'?PEOPLE_HR : PSCOPE==='all'?PEOPLE_DIRECT.concat(PEOPLE_EXTRA) : PEOPLE_DIRECT; }
+const dcls=d=>d===null?'r':d>90?'r':d>60?'a':'g';
+
+function renderPeople(){
+  const rows=pset().slice().sort((a,b)=>({r:0,a:1,g:2}[a.need[0]])-({r:0,a:1,g:2}[b.need[0]]));
+  document.getElementById('peopleCnt').textContent=rows.length;
+  document.getElementById('peopleBar').innerHTML=
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M12 3l9 16h-18z"/></svg>'+PEOPLE_BAR[PSCOPE];
+  document.getElementById('peopleList').innerHTML = rows.map((r,ix)=>`
+    <div class="prow" onclick="openPerson('${PSCOPE}',${ix})">
+      <div class="p1"><span class="pn">${r.n}</span></div>
+      <div class="pt">${r.t}</div>
+      <div class="need ${r.need[0]}"><span class="dotn"></span><span>${r.need[1]}</span></div>
+      <div class="pchips">
+        <span class="pchip ${dcls(r.oto.days)}">1:1 <b>${r.oto.days===null?'never':r.oto.days+'d'}</b></span>
+        <span class="pchip">PPM ${r.ppm}</span>
+        <span class="pchip">CVA ${r.cva}</span>
+        <span class="pchip ${r.act.over?'r':''}">${r.act.open} action${r.act.open===1?'':'s'}${r.act.over?' · '+r.act.over+' overdue':''}</span>
+        ${r.grw?`<span class="pchip a">${r.grw} growth</span>`:''}
+      </div>
+    </div>`).join('');
+}
+function setPeople(btn,v){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); PSCOPE=v; renderPeople();
+}
+
+/* ---- person sheet ---- */
+function openPerson(scope,ix){
+  const rows=pset().slice().sort((a,b)=>({r:0,a:1,g:2}[a.need[0]])-({r:0,a:1,g:2}[b.need[0]]));
+  const r=rows[ix]; if(!r) return;
+  document.getElementById('ps-name').textContent=r.n;
+  document.getElementById('ps-body').innerHTML=`
+    <div style="font-size:12px;color:var(--ink-3);margin:-4px 0 12px;">${r.t}</div>
+    <div class="need ${r.need[0]}" style="display:flex;gap:7px;align-items:flex-start;font-size:12.5px;line-height:1.45;margin-bottom:14px;color:var(--${r.need[0]==='r'?'alert':r.need[0]==='a'?'warn':'ink-3'});font-weight:${r.need[0]==='g'?'500':'700'};">
+      <span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;background:var(--${r.need[0]==='r'?'alert':r.need[0]==='a'?'warn':'ok'})"></span><span>${r.need[1]}</span></div>
+    <div class="sgrid">
+      <div class="sbox ${dcls(r.oto.days)==='r'?'r':dcls(r.oto.days)==='a'?'a':''}"><div class="sl">Last one-on-one</div><div class="sv">${r.oto.days===null?'Never':r.oto.days+' days'}</div><div class="sd">${r.oto.d}</div></div>
+      <div class="sbox"><div class="sl">PPM</div><div class="sv" style="font-size:13.5px">${r.ppm}</div><div class="sd">mid-cycle</div></div>
+      <div class="sbox"><div class="sl">CVA</div><div class="sv" style="font-size:13.5px">${r.cva}</div><div class="sd">annual</div></div>
+      <div class="sbox ${r.act.over?'r':''}"><div class="sl">Action items</div><div class="sv">${r.act.open} open</div><div class="sd">${r.act.over?r.act.over+' overdue':'none overdue'}</div></div>
+    </div>
+    ${r.grw?`<div class="privacy-note" style="margin:12px 0 0;background:var(--grw-wash);color:var(--grw);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+      ${r.grw} open growth request — you owe an acknowledgment or a decision.</div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+      <button class="btn pri" onclick="location.href='OneOnOne_Screens.html'">Log one-on-one</button>
+      <button class="btn" onclick="closeAllSheets();openSheet()">Quick note</button>
+      <button class="btn" onclick="closeAllSheets();go('cva')">Open CVA</button>
+      <button class="btn" onclick="location.href='Employee_Record.html'">Full record</button>
+    </div>`;
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('psheet').classList.add('on');
+}
+function openGrwSheet(){
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('gsheet').classList.add('on');
+}
+function submitGrowth(){
+  const t=(document.getElementById('g-text').value||'').trim();
+  if(t.length<12){ toast('Describe what you are asking for'); return; }
+  closeAllSheets(); toast('Submitted — acknowledgment owed within 5 business days');
+}
+
+/* ---- actions ---- */
+const ACT_MINE=[
+ {t:'Publish the Q3 systems review to Caroline', src:'One-on-one · Jun 30', due:'Jul 11', st:'over'},
+ {t:'Finish the Intune compliance baseline rollout', src:'PPM · Feb 2026 · Focus', due:'Jul 31', st:'open'},
+ {t:'Draft CVA rebuild phase 1 scope', src:'CVA 2026 follow-up', due:'Aug 14', st:'open'},
+ {t:'Move prototype hosting to the org GitHub Pages', src:'Standalone', due:'Jun 20', st:'done'}
+];
+const ACT_TEAM=[
+ {t:'Complete EPA 608 recertification', who:'Tom Reyes', src:'Growth request', due:'Jun 29', st:'over'},
+ {t:'Write the Assistant Manager outline for Renata', who:'You', src:'One-on-one · Jun 18', due:'Jul 18', st:'open', mine:true},
+ {t:'Take over weekly delinquency review', who:'Dana Carter', src:'PPM goal', due:'Aug 1', st:'open'},
+ {t:'Book a one-on-one with Luis Ferrer', who:'You', src:'Exception flag', due:'Jul 18', st:'open', mine:true},
+ {t:'Shadow two renewal conversations', who:'Sarah Mitchell', src:'One-on-one · Jun 12', due:'Aug 30', st:'open'}
+];
+const ACT_GRW=[
+ {t:'Assistant Manager track', who:'Renata Cole', raised:'Jun 18', st:['Unanswered 22 days','alert']},
+ {t:'Yardi reporting training', who:'Luis Ferrer', raised:'Jun 30', st:['Unanswered 14 days','alert']},
+ {t:'Certified Apartment Manager', who:'Sarah Mitchell', raised:'May 2', st:['Approved','ok']}
+];
+let AHAT='mine';
+function actRow(a){
+  return `<div class="arow ${a.st==='done'?'done':''}" onclick="toast('Would open the item')">
+    <span class="abox">${a.st==='done'?'✓':''}</span>
+    <div style="flex:1">
+      <div class="at">${a.t}</div>
+      <div class="am">
+        ${a.who?`<span class="tag ${a.mine?'warn':'cva'}">${a.mine?'You owe this':a.who}</span>`:''}
+        <span class="tag oto">${a.src}</span>
+        <span class="tag ${a.st==='over'?'alert':a.st==='done'?'ok':'cva'}" style="background:${a.st==='over'?'var(--alert-wash)':'var(--card-2)'};color:${a.st==='over'?'var(--alert)':'var(--ink-3)'}">${a.st==='over'?'Overdue · '+a.due:a.st==='done'?'Complete':'Due '+a.due}</span>
+      </div>
+    </div></div>`;
+}
+function renderActs(){
+  const b=document.getElementById('actBody');
+  if(AHAT==='mine'){
+    b.innerHTML=`<div class="sect">Open <span class="cnt">3</span></div>
+      <div class="cardlist">${ACT_MINE.filter(a=>a.st!=='done').map(actRow).join('')}</div>
+      <a class="btn block" href="Action_Items.html" style="text-decoration:none;justify-content:center;">Open the full action items screen →</a>
+      <div class="sect">Closed this cycle</div>
+      <div class="cardlist">${ACT_MINE.filter(a=>a.st==='done').map(actRow).join('')}</div>`;
+  } else if(AHAT==='team'){
+    b.innerHTML=`<div class="sect">Owed by your team <span class="cnt">3</span></div>
+      <div class="cardlist">${ACT_TEAM.filter(a=>!a.mine).map(actRow).join('')}</div>
+      <div class="sect">Owed by you to them <span class="cnt">2</span></div>
+      <div class="cardlist">${ACT_TEAM.filter(a=>a.mine).map(actRow).join('')}</div>`;
+  } else {
+    b.innerHTML=`<div class="sect">Growth requests <span class="cnt">3</span></div>
+      <div class="cardlist">${ACT_GRW.map(g=>`
+        <div class="crow" onclick="toast('Would open the request')">
+          <div class="r1"><span class="who">${g.t}</span><span class="tag ${g.st[1]}">${g.st[0]}</span></div>
+          <div class="meta">${g.who} · raised ${g.raised}</div>
+          <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+        </div>`).join('')}</div>
+      <div class="privacy-note" style="margin-top:14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M12 3l9 16h-18z"/></svg>
+        A decline cannot be recorded without a written reason. Silence is the only real failure, which is why unanswered requests escalate rather than expire.
+      </div>`;
+  }
+}
+function setActs(btn,v){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); AHAT=v; renderActs();
+}
+
+/* ---- home strips ---- */
+function renderHome(){
+  const ha=document.getElementById('homeActions'); if(!ha) return;
+  ha.innerHTML=ACT_MINE.filter(a=>a.st!=='done').map(a=>`
+    <div class="crow" onclick="go('actions')">
+      <div class="r1"><span class="who" style="font-size:13.5px;">${a.t}</span>${a.st==='over'?'<span class="tag alert">Overdue</span>':''}</div>
+      <div class="meta">${a.src} · due ${a.due}</div>
+      <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+    </div>`).join('');
+  document.getElementById('homeNeeds').innerHTML=PEOPLE_DIRECT
+    .filter(r=>r.need[0]!=='g').slice(0,2).map(r=>`
+    <div class="crow" onclick="go('people')">
+      <div class="r1"><span class="who">${r.n}</span><span class="tag ${r.need[0]==='r'?'alert':'warn'}">${r.need[0]==='r'?'Needs attention':'Coming due'}</span></div>
+      <div class="meta">${r.need[1]}</div>
+      <div class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6l-6 6"/></svg></div>
+    </div>`).join('');
+}
+
+renderPeople(); renderActs(); renderHome();
+
 </script>
 </body>
 </html>

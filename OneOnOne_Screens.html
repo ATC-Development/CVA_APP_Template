@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC One-on-One · Form Screens Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ATC EMPLOYEE RECORD · shared prototype chassis
+   Tokens shared with CVA_Dashboard / CVA_Form_Screens / PPM_Form_Screens
+   Per-page accent is set via --ac / --ac-wash
+   ============================================================ */
+:root{
+  --paper:#e9edf0;
+  --card:#ffffff;
+  --card-2:#f5f7f9;
+  --ink:#16232e;
+  --ink-2:#4d5d6b;
+  --ink-3:#8b99a5;
+  --line:rgba(22,35,46,.12);
+  --line-strong:rgba(22,35,46,.22);
+
+  --atc:#2a97d4;
+  --atc-deep:#12639b;
+  --atc-wash:#e8f4fb;
+
+  --ok:#2e7d4f;   --ok-wash:#e8f4ec;
+  --warn:#b06a1a; --warn-wash:#fbf1e2;
+  --alert:#bf3a2b;--alert-wash:#fbeae7;
+  --ai:#6d4fa1;   --ai-wash:#f1ecf9;
+  --ppm:#0e7c86;  --ppm-wash:#e5f4f5;
+  --oto:#5163b8;  --oto-wash:#eaedfa;
+  --act:#a05a2c;  --act-wash:#f8efe6;
+  --grw:#2e7d4f;  --grw-wash:#e8f4ec;
+  --note:#8b99a5; --note-wash:#eef1f4;
+
+  --r:12px; --rs:7px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --paper:#141a1f; --card:#1e262d; --card-2:#242e36;
+    --ink:#e7edf2; --ink-2:#9fb0bd; --ink-3:#657683;
+    --line:rgba(231,237,242,.10); --line-strong:rgba(231,237,242,.22);
+    --atc:#4db1e8; --atc-deep:#a5d8f5; --atc-wash:#0e2c40;
+    --ok:#5cba8a; --ok-wash:#122b1e;
+    --warn:#e0a054; --warn-wash:#33230d;
+    --alert:#e57a6d; --alert-wash:#361412;
+    --ai:#a98fd6; --ai-wash:#241a36;
+    --ppm:#4cbac3; --ppm-wash:#0c2b2e;
+    --oto:#8b9ae0; --oto-wash:#1a2044;
+    --act:#d69457; --act-wash:#33210f;
+    --grw:#5cba8a; --grw-wash:#122b1e;
+    --note:#8b99a5; --note-wash:#232c34;
+  }
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font); background:var(--paper); color:var(--ink); font-size:14px; -webkit-font-smoothing:antialiased;}
+button{font-family:var(--font);}
+textarea,input,select{font-family:var(--font); color:var(--ink);}
+svg{display:block;}
+
+/* ---------- top chrome ---------- */
+.topbar{display:flex; align-items:center; gap:18px; padding:10px 18px; background:var(--ink); color:#dfe8ee; position:sticky; top:0; z-index:60; flex-wrap:wrap;}
+@media(prefers-color-scheme:dark){ .topbar{background:#0d1319;} }
+.topbar .logo{display:flex; align-items:center; gap:10px;}
+.topbar .logo .mark{width:26px;height:26px;border-radius:6px;background:var(--ac);display:grid;place-items:center;font-weight:900;color:#fff;font-size:12px;}
+.topbar .logo .t{font-weight:800; font-size:14px; letter-spacing:.02em;}
+.topbar .logo .t small{display:block;font-weight:600;font-size:10px;color:#9fb0bd;letter-spacing:.14em;text-transform:uppercase;}
+.modes{display:flex; gap:4px; flex-wrap:wrap;}
+.modes button{border:1px solid rgba(255,255,255,.14); background:transparent; color:#c4d2dc; padding:6px 11px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer; letter-spacing:.02em;}
+.modes button .k{opacity:.55; font-weight:800; margin-right:5px;}
+.modes button.on{background:var(--ac); border-color:var(--ac); color:#fff;}
+.modes button:hover:not(.on){background:rgba(255,255,255,.08);}
+.proto{margin-left:auto; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7d8f9d; font-weight:700;}
+
+/* ---------- subject header ---------- */
+.emphead{display:flex; align-items:center; gap:16px; padding:12px 22px; background:var(--card); border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.emphead .av{width:40px;height:40px;border-radius:50%;background:var(--ac-wash);color:var(--ac);display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0;}
+.emphead .who .nm{font-weight:800; font-size:16px; font-variation-settings:'wdth' 110;}
+.emphead .who .ti{font-size:12px; color:var(--ink-2);}
+.emphead .mode-desc{font-size:12px; color:var(--ink-2); border-left:1px solid var(--line); padding-left:16px; max-width:380px; line-height:1.45;}
+.emphead .mode-desc b{color:var(--ink);}
+.headacts{display:flex; gap:8px; margin-left:auto;}
+
+.btn{border:1px solid var(--line-strong); border-radius:9px; padding:8px 14px; background:var(--card); color:var(--ink); font-size:12.5px; font-weight:700; cursor:pointer;}
+.btn:hover{border-color:var(--ac);}
+.btn.pri{background:var(--ac); border-color:var(--ac); color:#fff;}
+.btn.pri:hover{filter:brightness(1.08);}
+.btn.sm{padding:5px 10px; font-size:11.5px; border-radius:7px;}
+.btn.ghost{background:transparent;}
+.btn.danger{border-color:var(--alert); color:var(--alert);}
+.btn:disabled{opacity:.42; cursor:not-allowed;}
+
+/* ---------- mode sections ---------- */
+.mode{display:none;}
+.mode.on{display:block;}
+.mode-note{margin:14px 22px 0; padding:9px 14px; border-radius:var(--rs); background:var(--ac-wash); color:var(--ac); font-size:12px; font-weight:600; display:flex; gap:8px; align-items:center; line-height:1.45;}
+.mode-note svg{flex-shrink:0;}
+.mode-note.warnband{background:var(--warn-wash); color:var(--warn);}
+.mode-note.okband{background:var(--ok-wash); color:var(--ok);}
+
+/* ---------- generic layout ---------- */
+.centerwrap{max-width:1000px; margin:0 auto; padding:14px 22px 48px;}
+.widewrap{max-width:1360px; margin:0 auto; padding:14px 22px 48px;}
+.cols{display:grid; gap:14px; align-items:start;}
+.cols.c-rail{grid-template-columns:236px 1fr 300px;}
+.cols.c-2{grid-template-columns:1fr 320px;}
+@media(max-width:1180px){ .cols.c-rail{grid-template-columns:1fr;} .cols.c-2{grid-template-columns:1fr;} }
+
+.panelcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
+.panelcard .pchead{display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); background:var(--card-2); flex-wrap:wrap;}
+.panelcard .pchead .t{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2);}
+.panelcard .pchead .sub{font-size:11px; color:var(--ink-3); font-weight:600;}
+.pcbody{padding:14px 16px;}
+.secdiv{padding:7px 16px; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+/* ---------- chips / pills ---------- */
+.tag{font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:99px; white-space:nowrap; display:inline-block;}
+.tag.cva{background:var(--atc-wash); color:var(--atc-deep);}
+.tag.ppm{background:var(--ppm-wash); color:var(--ppm);}
+.tag.oto{background:var(--oto-wash); color:var(--oto);}
+.tag.act{background:var(--act-wash); color:var(--act);}
+.tag.grw{background:var(--grw-wash); color:var(--grw);}
+.tag.note{background:var(--note-wash); color:var(--ink-2);}
+.tag.ok{background:var(--ok-wash); color:var(--ok);}
+.tag.warn{background:var(--warn-wash); color:var(--warn);}
+.tag.alert{background:var(--alert-wash); color:var(--alert);}
+.tag.mute{background:var(--card-2); color:var(--ink-3);}
+.ratepill{min-width:32px; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; text-align:center; display:inline-block;}
+.ratepill.rp{background:var(--ok-wash); color:var(--ok);}
+.ratepill.rpm{background:var(--warn-wash); color:var(--warn);}
+.ratepill.rm{background:var(--alert-wash); color:var(--alert);}
+
+/* ---------- filter rail ---------- */
+.rail{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; position:sticky; top:78px;}
+.rail .rh{padding:10px 14px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); border-bottom:1px solid var(--line); background:var(--card-2);}
+.rail .rgroup{padding:10px 14px; border-bottom:1px solid var(--line);}
+.rail .rgroup:last-child{border-bottom:none;}
+.filt{display:flex; align-items:center; gap:9px; padding:5px 0; cursor:pointer; font-size:12.5px; font-weight:600; color:var(--ink-2); user-select:none;}
+.filt .sw{width:15px;height:15px;border-radius:4px;border:1.6px solid var(--line-strong);display:grid;place-items:center;flex-shrink:0;font-size:10px;color:#fff;font-weight:900;}
+.filt.on .sw{border-color:currentColor;}
+.filt .ct{margin-left:auto; font-size:10.5px; color:var(--ink-3); font-weight:700;}
+.filt.on{color:var(--ink);}
+.filt.dim{opacity:.42; cursor:not-allowed;}
+
+/* ---------- timeline ---------- */
+.tlwrap{position:relative; padding-left:6px;}
+.tlwrap::before{content:''; position:absolute; left:19px; top:8px; bottom:8px; width:2px; background:var(--line);}
+.tlyear{position:relative; margin:18px 0 10px; padding-left:46px; font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);}
+.tlrow{position:relative; padding-left:46px; margin-bottom:10px;}
+.tlrow .node{position:absolute; left:6px; top:14px; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--card); border:2px solid var(--line-strong); z-index:1;}
+.tlrow .node svg{width:14px;height:14px;}
+.tlrow.k-cva .node{border-color:var(--atc-deep); color:var(--atc-deep); background:var(--atc-wash);}
+.tlrow.k-ppm .node{border-color:var(--ppm); color:var(--ppm); background:var(--ppm-wash);}
+.tlrow.k-oto .node{border-color:var(--oto); color:var(--oto); background:var(--oto-wash);}
+.tlrow.k-act .node{border-color:var(--act); color:var(--act); background:var(--act-wash);}
+.tlrow.k-grw .node{border-color:var(--grw); color:var(--grw); background:var(--grw-wash);}
+.tlrow.k-note .node{border-color:var(--note); color:var(--ink-2); background:var(--note-wash);}
+.tlcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:12px 15px; cursor:pointer; transition:border-color .12s, transform .12s;}
+.tlcard:hover{border-color:var(--ac); transform:translateX(1px);}
+.tlcard .th{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+.tlcard .th .ttl{font-size:13.5px; font-weight:800; font-variation-settings:'wdth' 106;}
+.tlcard .th .dt{margin-left:auto; font-size:11px; color:var(--ink-3); font-weight:700;}
+.tlcard .tsum{font-size:12.5px; color:var(--ink-2); line-height:1.55; margin-top:6px;}
+.tlcard .tmeta{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--ink-3); font-weight:600;}
+.tlcard .tmeta b{color:var(--ink-2);}
+.tlcard.priv{border-style:dashed;}
+
+/* hidden-from-view band */
+.hiddenband{margin:10px 0 10px 46px; padding:10px 14px; border:1px dashed var(--line-strong); border-radius:var(--rs); background:var(--card-2); font-size:12px; color:var(--ink-3); line-height:1.5; display:flex; gap:9px; align-items:flex-start;}
+.hiddenband b{color:var(--ink-2);}
+.hiddenband svg{flex-shrink:0; margin-top:1px;}
+
+/* ---------- summary rail ---------- */
+.sumcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; margin-bottom:12px;}
+.sumcard .sh{padding:10px 14px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); border-bottom:1px solid var(--line); background:var(--card-2);}
+.sumcard .sb{padding:12px 14px;}
+.kv{display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; font-size:12.5px;}
+.kv .k{color:var(--ink-3); font-weight:600;}
+.kv .v{font-weight:800;}
+.bigstat{display:flex; align-items:baseline; gap:8px;}
+.bigstat .n{font-size:30px; font-weight:900; font-variation-settings:'wdth' 96; line-height:1;}
+.bigstat .l{font-size:11.5px; color:var(--ink-3); font-weight:700;}
+
+/* ---------- tables ---------- */
+.tbl{width:100%; border-collapse:collapse; font-size:12.5px;}
+.tbl th{text-align:left; padding:8px 12px; font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-bottom:1px solid var(--line); white-space:nowrap;}
+.tbl td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr.clickable{cursor:pointer;}
+.tbl tr.clickable:hover td{background:var(--ac-wash);}
+.tbl td.nm{font-weight:700;}
+.tbl .sub{font-size:11px; color:var(--ink-3); font-weight:600;}
+.tbl tr.locked td{opacity:.5;}
+
+/* ---------- forms ---------- */
+.fld{margin-bottom:13px;}
+.fld label{display:block; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:5px;}
+.fld textarea,.fld input,.fld select{width:100%; border:1px solid var(--line-strong); border-radius:var(--rs); padding:9px 11px; font-size:13px; line-height:1.5; background:var(--card);}
+.fld textarea{min-height:78px; resize:vertical;}
+.fld textarea:focus,.fld input:focus,.fld select:focus{outline:2px solid var(--ac); outline-offset:-1px; border-color:transparent;}
+.fldhint{font-size:11px; color:var(--ink-3); margin-top:5px; line-height:1.45;}
+.roblock{font-size:13px; line-height:1.55; color:var(--ink-2); background:var(--card-2); border-radius:var(--rs); padding:10px 12px;}
+.reqmark{color:var(--alert); font-weight:900;}
+
+/* ---------- commitment / action list ---------- */
+.itemlist{display:flex; flex-direction:column; gap:7px;}
+.iitem{display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border:1px solid var(--line); border-radius:var(--rs); background:var(--card-2); font-size:13px;}
+.iitem .ib{width:16px;height:16px;border-radius:5px;border:1.6px solid var(--line-strong);flex-shrink:0;margin-top:1px;display:grid;place-items:center;cursor:pointer;font-size:10px;font-weight:900;color:#fff;}
+.iitem.done .ib{background:var(--ok); border-color:var(--ok);}
+.iitem.done .it{text-decoration:line-through; color:var(--ink-3);}
+.iitem .it{flex:1; line-height:1.45;}
+.iitem .imeta{font-size:10.5px; color:var(--ink-3); font-weight:700; margin-top:3px; display:flex; gap:9px; flex-wrap:wrap;}
+.iitem .ix{border:none; background:transparent; color:var(--ink-3); cursor:pointer; font-size:14px; font-weight:800; padding:0 3px;}
+.iitem .ix:hover{color:var(--alert);}
+.itemadd{display:flex; gap:7px; margin-top:9px;}
+.itemadd input{flex:1; border:1px solid var(--line-strong); border-radius:var(--rs); padding:8px 11px; font-size:12.5px; background:var(--card);}
+.itemadd input:focus{outline:2px solid var(--ac); outline-offset:-1px;}
+.itemadd input.due{flex:0 0 132px;}
+
+/* ---------- stage track (compact) ---------- */
+.strack{display:flex; align-items:flex-start; gap:0; flex-wrap:nowrap;}
+.sstep{display:flex; flex-direction:column; align-items:center; width:88px; position:relative;}
+.sstep .dot{width:13px;height:13px;border-radius:50%;background:var(--card-2);border:2px solid var(--line-strong);z-index:1;}
+.sstep.done .dot{background:var(--ok);border-color:var(--ok);}
+.sstep.now .dot{background:var(--ac);border-color:var(--ac);box-shadow:0 0 0 4px var(--ac-wash);}
+.sstep.stop .dot{background:var(--alert);border-color:var(--alert);}
+.sstep:not(:first-child)::before{content:''; position:absolute; top:5.5px; right:50%; width:100%; height:2px; background:var(--line);}
+.sstep.done:not(:first-child)::before,.sstep.now:not(:first-child)::before{background:var(--ok);}
+.sstep .tl{font-size:8.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); margin-top:5px; text-align:center; line-height:1.25;}
+.sstep.now .tl{color:var(--ac);}
+.sstep.done .tl{color:var(--ink-2);}
+.sstep.stop .tl{color:var(--alert);}
+
+/* ---------- SLA clock ---------- */
+.sla{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; padding:3px 9px; border-radius:99px;}
+.sla.ok{background:var(--ok-wash); color:var(--ok);}
+.sla.warn{background:var(--warn-wash); color:var(--warn);}
+.sla.breach{background:var(--alert-wash); color:var(--alert);}
+
+/* ---------- signature ---------- */
+.signrow{display:flex; flex-wrap:wrap; gap:10px;}
+.sigcard{flex:1; min-width:210px; border:1px solid var(--line); border-radius:var(--rs); padding:10px 12px; background:var(--card-2);}
+.sigcard .sl{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.sigcard .sig{font-family:'Segoe Script','Bradley Hand',cursive; font-size:17px; margin-top:5px; color:var(--ink);}
+.sigcard .sd{font-size:10.5px; color:var(--ink-3); margin-top:2px;}
+.sigcard.pending{border-style:dashed;}
+.sigcard.pending .sig{color:var(--ink-3); font-family:var(--font); font-size:12px; font-weight:600;}
+
+/* ---------- dialog + toast ---------- */
+.overlay{position:fixed; inset:0; background:rgba(22,35,46,.45); display:none; z-index:100; align-items:center; justify-content:center; padding:20px;}
+.overlay.on{display:flex;}
+.dialog{background:var(--card); border-radius:var(--r); width:520px; max-width:94vw; max-height:88vh; overflow-y:auto; padding:22px; box-shadow:0 18px 50px rgba(0,0,0,.3);}
+.dialog h3{font-size:16px; font-weight:800; font-variation-settings:'wdth' 110;}
+.dialog p.dsub{font-size:12.5px; color:var(--ink-2); margin-top:6px; line-height:1.5;}
+.dialog .dacts{display:flex; gap:8px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap;}
+.dialog .sigbox{margin-top:14px; border:1px dashed var(--line-strong); border-radius:var(--rs); height:74px; display:grid; place-items:center; font-family:'Segoe Script','Bradley Hand',cursive; font-size:22px; background:var(--card-2);}
+.toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:99px; font-size:12.5px; font-weight:700; opacity:0; transition:all .25s; z-index:120; pointer-events:none;}
+@media(prefers-color-scheme:dark){ .toast{background:var(--ac);} }
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* ---------- design-note band (prototype annotation) ---------- */
+.dnote{margin:16px 22px 0; max-width:1360px; border:1px solid var(--line); border-left:4px solid var(--ai); border-radius:10px; background:var(--card); padding:13px 17px; font-size:12.5px; color:var(--ink-2); line-height:1.6;}
+.dnote b{color:var(--ink);}
+.dnote .dh{font-size:9.5px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ai); margin-bottom:5px;}
+.dnote ul{margin:7px 0 0 17px;}
+.dnote li{margin-bottom:3px;}
+
+.empty{padding:30px 16px; text-align:center; color:var(--ink-3); font-size:12.5px;}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ac); outline-offset:2px;}
+
+/* ---- page accent ---- */
+:root{ --ac:#5163b8; --ac-wash:#eaedfa; }
+@media(prefers-color-scheme:dark){ :root{ --ac:#8b9ae0; --ac-wash:#1a2044; } }
+.savestate{font-size:11.5px; color:var(--ok); font-weight:700;}
+.savestate::before{content:"✓ Saved";}
+.viewtoggle{display:flex;gap:4px;}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP CHROME ================= -->
+<div class="topbar">
+  <div class="logo">
+    <div class="mark">A</div>
+    <div class="t">One-on-One Screens<small>ATC Development · Prototype</small></div>
+  </div>
+  <div class="modes" id="modeTabs">
+    <button data-m="1" class="on"><span class="k">1</span>Supervisor · Drafting</button>
+    <button data-m="2"><span class="k">2</span>Shared · Employee Review</button>
+    <button data-m="3"><span class="k">3</span>Acknowledged · Locked</button>
+    <button data-m="4"><span class="k">4</span>Chain &amp; HR View</button>
+    <button data-m="5"><span class="k">5</span>Cadence Tracker</button>
+  </div>
+  <div class="proto" style="display:flex;gap:12px;align-items:center;"><a href="CVA_Dashboard.html" style="color:#8fb6cd;text-decoration:none;">Dashboard</a><a href="CVA_Mobile.html" style="color:#8fb6cd;text-decoration:none;">Mobile</a><a href="index.html" style="color:#8fb6cd;text-decoration:none;">All prototypes</a><span>Prototype · sample data</span></div>
+</div>
+
+<!-- ================= SUBJECT HEADER ================= -->
+<div class="emphead">
+  <div class="av" id="hAv">CM</div>
+  <div class="who">
+    <div class="nm" id="hName">Courtney Murrah</div>
+    <div class="ti" id="hTitle">Leasing Consultant · Riverbend · One-on-one · Sep 2, 2026</div>
+  </div>
+  <div class="mode-desc" id="modeDesc"></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:18px;">
+    <div class="strack" id="stageTrack"></div>
+    <div class="headacts" id="headActs"></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     MODE 1 · SUPERVISOR DRAFTING
+     ================================================================ -->
+<section class="mode on" id="m1">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Draft — visible only to you. Courtney is not notified that this exists until you share it. Nothing here reaches the chain or HR while it is a draft.
+  </div>
+  <div class="widewrap">
+    <div class="cols c-2">
+
+      <!-- form -->
+      <div class="panelcard">
+        <div class="pchead"><span class="t">One-on-one · Sep 2, 2026</span><span class="sub">Auto-saving</span>
+          <span style="margin-left:auto" class="savestate"></span></div>
+
+        <div class="secdiv">Meeting</div>
+        <div class="pcbody" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div class="fld" style="margin:0"><label>Date</label><input type="date" value="2026-09-02"></div>
+          <div class="fld" style="margin:0"><label>Format</label><select><option>In person</option><option>Teams</option><option>Phone</option></select></div>
+          <div class="fld" style="margin:0"><label>Type</label><select><option>Scheduled cadence</option><option>Ad hoc</option><option>Follow-up to PPM</option><option>Follow-up to CVA</option></select></div>
+        </div>
+
+        <div class="secdiv">1 · What we discussed</div>
+        <div class="pcbody">
+          <div class="fld">
+            <textarea placeholder="Topics covered. Write what was actually said, in language you would be comfortable with Courtney reading — because she will.">Went through the two Section 2 goals from the August PPM. Q4 renewal campaign is the big one — Courtney has the vendor list started and a draft timeline. Talked through the escalation habit we worked on in May; she flagged the print vendor slip to me the same morning she heard about it this time, which is the behaviour we were after.
+
+Also raised the Assistant Manager question from her June growth request. I do not have an opening to offer her, and I said so plainly rather than leaving it vague.</textarea>
+          </div>
+        </div>
+
+        <div class="secdiv">2 · What is going well</div>
+        <div class="pcbody">
+          <div class="fld" style="margin:0">
+            <textarea placeholder="Specific, evidenced, attributable.">Nine days running the property alone in July with no escalations and delinquency down. Front desk coverage on short notice, repeatedly, without being asked.</textarea>
+          </div>
+        </div>
+
+        <div class="secdiv">3 · Obstacles &amp; support needed</div>
+        <div class="pcbody">
+          <div class="fld" style="margin:0">
+            <textarea placeholder="What is in the way, and what the supervisor or the company owes here.">She needs a defined path for the Assistant Manager track or she will start looking outside. That is my read, not her words. I owe her a written development outline by the end of the month and I need Barry's input on what openings are realistic across the area.</textarea>
+            <div class="fldhint">This section is visible to the chain. It is the intended route for an employee's blocker to reach the person who can clear it.</div>
+          </div>
+        </div>
+
+        <div class="secdiv">4 · Commitments</div>
+        <div class="pcbody">
+          <div class="fldhint" style="margin:0 0 10px">Each commitment becomes a tracked action item on the owner's list. They appear on the employee record, are visible up the chain, and are carried into the next CVA as evidence.</div>
+          <div class="itemlist" id="commitList"></div>
+          <div class="itemadd">
+            <input id="ciText" placeholder="Commitment — who does what">
+            <select id="ciOwner" style="flex:0 0 150px;border:1px solid var(--line-strong);border-radius:var(--rs);padding:8px 10px;font-size:12.5px;background:var(--card);">
+              <option value="emp">Courtney</option><option value="sup">Maria</option>
+            </select>
+            <input id="ciDue" class="due" type="date" value="2026-09-30">
+            <button class="btn sm pri" onclick="addCommit()">Add</button>
+          </div>
+        </div>
+
+        <div class="pcbody" style="border-top:1px solid var(--line);display:flex;gap:9px;align-items:center;flex-wrap:wrap;">
+          <button class="btn ghost" onclick="toast('Draft saved — still invisible to Courtney')">Save draft</button>
+          <button class="btn pri" onclick="shareOto()">Share with Courtney</button>
+          <span class="fldhint" style="margin:0">Sharing is one-way. Once shared, the discussion sections lock and Courtney is notified.</span>
+        </div>
+      </div>
+
+      <!-- right rail -->
+      <div>
+        <div class="sumcard" style="border-left:3px solid var(--ai);">
+          <div class="sh" style="color:var(--ai)">Private to you — not part of this record</div>
+          <div class="sb">
+            <div class="fld" style="margin:0">
+              <textarea style="min-height:82px" placeholder="A supervisor note. Goes to the year-round observation log, not into the one-on-one. Courtney never sees this; HR does.">My honest read is she is a year from being ready, not six months. Judgment under pressure is there; the administrative discipline is not yet. Do not put that in the shared record — coach it.</textarea>
+              <div class="fldhint">Writes to <b>SupervisorNote</b>, Active, visible to you and HR. This escape hatch exists so the shared record can stay candid without becoming the only place you can think out loud.</div>
+              <button class="btn sm" style="margin-top:9px;width:100%" onclick="toast('Would save a supervisor note (private)')">Save private note</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sumcard">
+          <div class="sh">Since the last one-on-one · May 15</div>
+          <div class="sb">
+            <div class="kv"><span class="k">Days elapsed</span><span class="v" style="color:var(--warn)">110</span></div>
+            <div class="kv"><span class="k">Supervisor notes captured</span><span class="v">2</span></div>
+            <div class="kv"><span class="k">Commitments closed</span><span class="v">1 of 2</span></div>
+            <div class="kv"><span class="k">Open growth requests</span><span class="v">1</span></div>
+          </div>
+        </div>
+
+        <div class="sumcard">
+          <div class="sh">Carried forward · still open</div>
+          <div class="sb">
+            <div class="itemlist">
+              <div class="iitem"><span class="ib"></span><div style="flex:1"><div class="it">Own the Q4 renewal campaign end to end</div><div class="imeta"><span>PPM · Aug 2026</span><span>Due Dec 15</span></div></div></div>
+              <div class="iitem"><span class="ib"></span><div style="flex:1"><div class="it">Build a shadowing rotation with maintenance</div><div class="imeta"><span>PPM · Aug 2026</span><span>Due Nov 1</span></div></div></div>
+              <div class="iitem" style="border-color:var(--alert)"><span class="ib"></span><div style="flex:1"><div class="it">Submit September market survey</div><div class="imeta"><span>Standalone</span><span style="color:var(--alert)">Overdue 4 days</span></div></div></div>
+            </div>
+            <div class="fldhint" style="margin-top:9px">Open items are pulled in automatically so the meeting starts from what is already owed, not from memory.</div>
+          </div>
+        </div>
+
+        <div class="sumcard">
+          <div class="sh">Prior one-on-one · May 15, 2026</div>
+          <div class="sb">
+            <div class="roblock" style="font-size:12px">Coached on escalating risk early. Courtney agreed to a Monday status note on anything with a deadline she does not control.</div>
+            <div style="margin-top:8px"><span class="tag ok">Acknowledged May 16</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 2 · SHARED — EMPLOYEE REVIEW
+     ================================================================ -->
+<section class="mode" id="m2">
+  <div class="mode-note warnband">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+    Shared and awaiting your acknowledgment. The record is locked for editing. Acknowledging confirms you have read it — it does not mean you agree with it. Your comment is added to the permanent record.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard">
+      <div class="pchead"><span class="t">One-on-one · Sep 2, 2026</span><span class="sub">Author: Maria Gonzales · shared Sep 3</span>
+        <span class="tag warn" style="margin-left:auto">Awaiting acknowledgment</span></div>
+      <div id="roBody2"></div>
+
+      <div class="secdiv">Your response</div>
+      <div class="pcbody">
+        <div class="fld">
+          <label>Comment <span style="text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink-3)">— optional, permanent, visible to the chain and HR</span></label>
+          <textarea id="empComment" placeholder="If you see this differently, say so here. This is the only place your account of the conversation enters the record.">Agreed on all of it. On the Assistant Manager question — I appreciate the straight answer. I would rather know there is no opening now than be told to be patient with nothing behind it. I will take the written outline when it is ready.</textarea>
+        </div>
+        <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;">
+          <button class="btn pri" onclick="ackOto()">Acknowledge</button>
+          <button class="btn" onclick="toast('Would flag for HR review — record stays unacknowledged')">Acknowledge with concern</button>
+          <span class="fldhint" style="margin:0">"With concern" notifies HR and leaves the record flagged. It does not block the record.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dnote" style="margin:16px 0 0;">
+      <div class="dh">Decision this screen forces</div>
+      Acknowledgment is the fairness mechanism. A supervisor-authored account that travels up the chain with no employee response is the shape that causes problems in a dispute. Three options: <b>(a)</b> acknowledgment required before the record locks — highest integrity, but a non-responding employee stalls the record; <b>(b)</b> acknowledgment invited, auto-locks after N days with "not acknowledged" stamped — recommended; <b>(c)</b> no acknowledgment at all — lowest friction, weakest position. This prototype implements (b) with a 10-day window.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 3 · ACKNOWLEDGED / LOCKED
+     ================================================================ -->
+<section class="mode" id="m3">
+  <div class="mode-note okband">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>
+    Acknowledged and locked. Immutable from this point. Commitments are now live action items on the employee record and will be surfaced as evidence in the next CVA.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard">
+      <div class="pchead"><span class="t">One-on-one · Sep 2, 2026</span><span class="sub">Author: Maria Gonzales</span>
+        <span class="tag ok" style="margin-left:auto">Acknowledged Sep 4, 2026</span></div>
+      <div id="roBody3"></div>
+      <div class="secdiv">Record</div>
+      <div class="pcbody">
+        <div class="signrow">
+          <div class="sigcard"><div class="sl">Authored &amp; shared</div><div class="sig">Maria Gonzales</div><div class="sd">Sep 3, 2026 · 4:12 PM</div></div>
+          <div class="sigcard"><div class="sl">Acknowledged</div><div class="sig">Courtney Murrah</div><div class="sd">Sep 4, 2026 · 8:47 AM · read, not necessarily agreed</div></div>
+        </div>
+        <div class="fldhint" style="margin-top:11px">Locked one-on-ones are never deleted. If the author later judges an entry incorrect, the correction path is an appended amendment — the original text stays.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 4 · CHAIN & HR VIEW
+     ================================================================ -->
+<section class="mode" id="m4">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    Read-only. Chain access is resolved at request time from Graph; HR access to an individual record is audit-logged.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard">
+      <div class="pchead"><span class="t">One-on-one · Sep 2, 2026</span>
+        <span class="viewtoggle" style="margin-left:auto;display:flex;gap:4px;">
+          <button class="btn sm pri" id="v4a" onclick="setV4('chain')">Barry · Area Manager</button>
+          <button class="btn sm" id="v4b" onclick="setV4('hr')">Meg · HR Operations</button>
+        </span></div>
+      <div id="roBody4"></div>
+      <div class="pcbody" id="v4Foot" style="border-top:1px solid var(--line)"></div>
+    </div>
+
+    <div class="dnote" style="margin:16px 0 0;">
+      <div class="dh">Boundary being tested here</div>
+      Barry can read the record but cannot write to it and cannot see Maria's private supervisor note on Courtney. If Barry has an observation, he writes his own note under his own name. This preserves the locked rule — <b>notes belong to the current direct supervisor and HR</b> — while still letting the "obstacles &amp; support needed" section route a blocker upward, which is the whole point of documenting the meeting.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 5 · CADENCE TRACKER
+     ================================================================ -->
+<section class="mode" id="m5">
+  <div class="mode-note warnband">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    The moment one-on-ones are logged and visible up the chain, they become measurable. This screen exists to make that consequence explicit before it is decided, not to assume it.
+  </div>
+  <div class="widewrap">
+    <div class="cols c-2">
+      <div>
+        <div class="panelcard" style="margin-bottom:14px;">
+          <div class="pchead"><span class="t">Riverbend · Maria's team</span><span class="sub">6 direct reports</span>
+            <span style="margin-left:auto"><button class="btn sm pri" onclick="toast('Would start a new one-on-one')">Log a one-on-one</button></span></div>
+          <table class="tbl" id="teamTbl"></table>
+        </div>
+
+        <div class="panelcard">
+          <div class="pchead"><span class="t">Area roll-up · Barry's view</span><span class="sub">4 properties</span></div>
+          <table class="tbl" id="areaTbl"></table>
+        </div>
+      </div>
+
+      <div>
+        <div class="sumcard"><div class="sh">Riverbend cadence</div><div class="sb">
+          <div class="bigstat"><span class="n" style="color:var(--warn)">2</span><span class="l">reports past 90 days</span></div>
+          <div class="kv"><span class="k">Median days since</span><span class="v">47</span></div>
+          <div class="kv"><span class="k">Longest gap</span><span class="v" style="color:var(--alert)">168 days</span></div>
+          <div class="kv"><span class="k">Acknowledged within 10 days</span><span class="v" style="color:var(--ok)">100%</span></div>
+        </div></div>
+
+        <div class="sumcard" style="border-left:3px solid var(--ai);">
+          <div class="sh" style="color:var(--ai)">Open decision · cadence policy</div>
+          <div class="sb">
+            <div class="fldhint" style="margin:0 0 10px">Pick one before build. The choice changes what this table means.</div>
+            <div class="itemlist">
+              <div class="iitem"><span class="ib"></span><div style="flex:1"><div class="it"><b>Documented when they happen</b></div><div class="imeta"><span>No target. Table is informational. Lowest distortion, weakest accountability.</span></div></div></div>
+              <div class="iitem"><span class="ib"></span><div style="flex:1"><div class="it"><b>Suggested cadence, visible gap</b></div><div class="imeta"><span>Target shown, no enforcement, no escalation. Recommended starting position.</span></div></div></div>
+              <div class="iitem"><span class="ib"></span><div style="flex:1"><div class="it"><b>Required cadence, escalates</b></div><div class="imeta"><span>Gap over N days notifies the chain. Strongest accountability, highest risk of ritual compliance.</span></div></div></div>
+            </div>
+            <div class="fldhint" style="margin-top:10px">The failure mode of option three is a manager logging six one-line one-on-ones in December. Consider whether a quality signal — acknowledgment rate, commitment close rate — belongs alongside the count.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const EMP={n:'Courtney Murrah',i:'CM',r:'Leasing Consultant · Riverbend'};
+const SUP={n:'Maria Gonzales',i:'MG',r:'Property Manager · Riverbend'};
+
+const OTO={
+  date:'Sep 2, 2026',
+  discussed:`Went through the two Section 2 goals from the August PPM. Q4 renewal campaign is the big one — Courtney has the vendor list started and a draft timeline. Talked through the escalation habit we worked on in May; she flagged the print vendor slip to me the same morning she heard about it this time, which is the behaviour we were after.
+
+Also raised the Assistant Manager question from her June growth request. I do not have an opening to offer her, and I said so plainly rather than leaving it vague.`,
+  going:`Nine days running the property alone in July with no escalations and delinquency down. Front desk coverage on short notice, repeatedly, without being asked.`,
+  obstacles:`She needs a defined path for the Assistant Manager track or she will start looking outside. That is my read, not her words. I owe her a written development outline by the end of the month and I need Barry's input on what openings are realistic across the area.`,
+  comment:`Agreed on all of it. On the Assistant Manager question — I appreciate the straight answer. I would rather know there is no opening now than be told to be patient with nothing behind it. I will take the written outline when it is ready.`
+};
+
+let COMMITS=[
+  {t:'Draft the Q4 renewal campaign timeline and send to Maria', o:'emp', due:'Sep 19, 2026', done:false},
+  {t:'Write the Assistant Manager development outline', o:'sup', due:'Sep 30, 2026', done:false},
+  {t:'Raise area-wide AM openings with Barry', o:'sup', due:'Sep 12, 2026', done:true},
+  {t:'Close out the overdue September market survey', o:'emp', due:'Sep 9, 2026', done:false}
+];
+
+const TEAM=[
+  {n:'Courtney Murrah', r:'Leasing Consultant', last:'May 15, 2026', days:110, open:3, over:1, cva:'Sep 12', st:['Draft in progress','warn']},
+  {n:'Devon Pruitt',    r:'Leasing Consultant', last:'Aug 21, 2026', days:18,  open:2, over:0, cva:'Feb 3',  st:['Current','ok']},
+  {n:'Alicia Reyes',    r:'Assistant Manager',  last:'Aug 6, 2026',  days:33,  open:4, over:0, cva:'Nov 18', st:['Current','ok']},
+  {n:'Ray Bourgeois',   r:'Maintenance Tech',   last:'Mar 24, 2026', days:168, open:1, over:1, cva:'Jan 9',  st:['No meeting in 5 months','alert']},
+  {n:'Tasha Bell',      r:'Maintenance Tech',   last:'Jul 30, 2026', days:40,  open:0, over:0, cva:'Jun 22', st:['Current','ok']},
+  {n:'Nate Okafor',     r:'Groundskeeper',      last:'Aug 28, 2026', days:11,  open:1, over:0, cva:'Apr 15', st:['Current','ok']}
+];
+
+const AREA=[
+  {p:'Riverbend',    mgr:'Maria Gonzales', staff:6,  med:47,  gaps:2, ack:'100%'},
+  {p:'Cypress Walk', mgr:'Dana Whitfield', staff:8,  med:31,  gaps:0, ack:'96%'},
+  {p:'Stonebridge',  mgr:'Kevin Marsh',    staff:5,  med:94,  gaps:3, ack:'71%'},
+  {p:'Laurel Point', mgr:'Priya Raman',    staff:7,  med:28,  gaps:0, ack:'100%'}
+];
+
+const STAGES=['Draft','Shared','Acknowledged','Locked'];
+const MODESTAGE={1:0,2:1,3:2,4:3,5:-1};
+const MODEDESC={
+  1:'<b>Supervisor drafting.</b> Private until shared. The private-note panel on the right writes to the supervisor note log, not to this record.',
+  2:'<b>Employee review.</b> Read-only with one writable field. Acknowledgment confirms reading, not agreement.',
+  3:'<b>Locked.</b> Immutable. Corrections are appended amendments, never edits.',
+  4:'<b>Chain and HR.</b> Read-only. Supervisor notes are excluded from both.',
+  5:'<b>Cadence tracker.</b> What the chain sees when one-on-ones become measurable.'
+};
+
+let MODE=1, V4='chain';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const para=s=>esc(s).split('\n\n').map(p=>`<p style="margin-bottom:9px">${p.replace(/\n/g,'<br>')}</p>`).join('');
+
+/* ============================================================
+   COMMITMENTS
+   ============================================================ */
+function renderCommits(){
+  document.getElementById('commitList').innerHTML = COMMITS.map((c,i)=>`
+    <div class="iitem ${c.done?'done':''}">
+      <span class="ib" onclick="togCommit(${i})">${c.done?'✓':''}</span>
+      <div style="flex:1">
+        <div class="it">${esc(c.t)}</div>
+        <div class="imeta"><span>Owner: <b>${c.o==='emp'?EMP.n:SUP.n}</b></span><span>Due ${c.due}</span><span>→ becomes an action item</span></div>
+      </div>
+      <button class="ix" onclick="delCommit(${i})">×</button>
+    </div>`).join('') || '<div class="empty">No commitments yet. A one-on-one with no commitments is allowed, but it will show as a conversation with no output.</div>';
+}
+function togCommit(i){ COMMITS[i].done=!COMMITS[i].done; renderCommits(); }
+function delCommit(i){ COMMITS.splice(i,1); renderCommits(); }
+function addCommit(){
+  const t=document.getElementById('ciText').value.trim(); if(!t) return;
+  const o=document.getElementById('ciOwner').value;
+  const d=document.getElementById('ciDue').value;
+  COMMITS.push({t,o,due:d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'No date',done:false});
+  document.getElementById('ciText').value=''; renderCommits();
+  toast('Commitment added — will create an action item on share');
+}
+
+/* ============================================================
+   READ-ONLY RENDER (modes 2, 3, 4)
+   ============================================================ */
+function roBody(opts){
+  const {showComment,showCommits,viewer}=opts;
+  let h='';
+  h+=`<div class="secdiv">1 · What we discussed</div><div class="pcbody"><div class="roblock">${para(OTO.discussed)}</div></div>`;
+  h+=`<div class="secdiv">2 · What is going well</div><div class="pcbody"><div class="roblock">${para(OTO.going)}</div></div>`;
+  h+=`<div class="secdiv">3 · Obstacles &amp; support needed</div><div class="pcbody"><div class="roblock">${para(OTO.obstacles)}</div>`;
+  if(viewer==='chain') h+=`<div class="fldhint" style="color:var(--warn);font-weight:700;margin-top:9px">↑ This section names you. Maria has asked for area-level input on Assistant Manager openings.</div>`;
+  h+=`</div>`;
+
+  if(showCommits!==false){
+    h+=`<div class="secdiv">4 · Commitments</div><div class="pcbody"><div class="itemlist">`;
+    h+=COMMITS.map(c=>`<div class="iitem ${c.done?'done':''}"><span class="ib">${c.done?'✓':''}</span><div style="flex:1"><div class="it">${esc(c.t)}</div><div class="imeta"><span>Owner: <b>${c.o==='emp'?EMP.n:SUP.n}</b></span><span>Due ${c.due}</span></div></div></div>`).join('');
+    h+=`</div></div>`;
+  }
+  if(showComment){
+    h+=`<div class="secdiv">Employee response</div><div class="pcbody"><div class="roblock">${para(OTO.comment)}</div>
+        <div class="fldhint" style="margin-top:8px">Recorded Sep 4, 2026. Permanent. Visible wherever the one-on-one is visible.</div></div>`;
+  }
+  if(viewer){
+    h+=`<div class="secdiv">Not shown in this view</div><div class="pcbody">
+      <div class="hiddenband" style="margin:0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><path d="M1 1l22 22"/></svg>
+        <div>${viewer==='chain'
+          ? `<b>Maria's private supervisor note from this meeting is not visible to you.</b> Notes belong to the current direct supervisor and HR. If you need an observation on record, write your own under your own name.`
+          : `<b>One private supervisor note was written alongside this meeting.</b> It is available to HR through the notes log, not through this record. Opening it is logged separately.`}</div>
+      </div></div>`;
+  }
+  return h;
+}
+
+/* ============================================================
+   MODE 5 TABLES
+   ============================================================ */
+function renderTables(){
+  document.getElementById('teamTbl').innerHTML =
+    `<thead><tr><th>Employee</th><th>Last one-on-one</th><th>Days</th><th>Open items</th><th>Next CVA</th><th>Status</th></tr></thead><tbody>`+
+    TEAM.map(t=>`<tr class="clickable" onclick="toast('Would open ${esc(t.n)}\\'s record')">
+      <td class="nm">${t.n}<div class="sub">${t.r}</div></td>
+      <td>${t.last}</td>
+      <td style="font-weight:800;color:${t.days>90?'var(--alert)':t.days>60?'var(--warn)':'var(--ink)'}">${t.days}</td>
+      <td>${t.open}${t.over?` <span class="tag alert">${t.over} overdue</span>`:''}</td>
+      <td>${t.cva}</td>
+      <td><span class="tag ${t.st[1]}">${t.st[0]}</span></td>
+    </tr>`).join('')+`</tbody>`;
+
+  document.getElementById('areaTbl').innerHTML =
+    `<thead><tr><th>Property</th><th>Manager</th><th>Staff</th><th>Median days</th><th>Gaps &gt; 90d</th><th>Ack rate</th></tr></thead><tbody>`+
+    AREA.map(a=>`<tr class="clickable" onclick="toast('Would drill into ${esc(a.p)}')">
+      <td class="nm">${a.p}</td><td>${a.mgr}</td><td>${a.staff}</td>
+      <td style="font-weight:800;color:${a.med>90?'var(--alert)':a.med>60?'var(--warn)':'var(--ink)'}">${a.med}</td>
+      <td>${a.gaps?`<span class="tag ${a.gaps>2?'alert':'warn'}">${a.gaps}</span>`:'<span class="tag ok">0</span>'}</td>
+      <td style="font-weight:700;color:${parseInt(a.ack)<90?'var(--warn)':'var(--ok)'}">${a.ack}</td>
+    </tr>`).join('')+`</tbody>`;
+}
+
+/* ============================================================
+   CHROME
+   ============================================================ */
+function renderStage(){
+  const idx=MODESTAGE[MODE];
+  document.getElementById('stageTrack').innerHTML = idx<0 ? '' :
+    STAGES.map((s,i)=>`<div class="sstep ${i<idx?'done':i===idx?'now':''}"><div class="dot"></div><div class="tl">${s}</div></div>`).join('');
+}
+function renderActs(){
+  const a={
+    1:'<span style="font-size:11.5px;color:var(--ink-3);font-weight:700">Draft · auto-saving</span>',
+    2:'<button class="btn pri" onclick="ackOto()">Acknowledge</button>',
+    3:'<button class="btn ghost" onclick="toast(\'Would append an amendment — original text is preserved\')">Append amendment</button>',
+    4:'<button class="btn ghost" onclick="toast(\'Would export as PDF\')">Export</button>',
+    5:'<button class="btn ghost" onclick="toast(\'Would export cadence report\')">Export cadence</button>'
+  }[MODE];
+  document.getElementById('headActs').innerHTML=a;
+}
+function setMode(m){
+  MODE=m;
+  document.querySelectorAll('#modeTabs button').forEach(b=>b.classList.toggle('on',+b.dataset.m===m));
+  document.querySelectorAll('.mode').forEach(s=>s.classList.toggle('on',s.id==='m'+m));
+  document.getElementById('modeDesc').innerHTML=MODEDESC[m];
+  const h5 = m===5;
+  document.getElementById('hAv').textContent = h5?'MG':'CM';
+  document.getElementById('hName').textContent = h5?'Maria Gonzales':'Courtney Murrah';
+  document.getElementById('hTitle').textContent = h5?'Property Manager · Riverbend · team cadence':'Leasing Consultant · Riverbend · One-on-one · Sep 2, 2026';
+  renderStage(); renderActs();
+}
+function setV4(v){
+  V4=v;
+  document.getElementById('v4a').className='btn sm '+(v==='chain'?'pri':'');
+  document.getElementById('v4b').className='btn sm '+(v==='hr'?'pri':'');
+  document.getElementById('roBody4').innerHTML=roBody({showComment:true,viewer:v});
+  document.getElementById('v4Foot').innerHTML = v==='chain'
+    ? `<div class="fldhint" style="margin:0"><b>Barry Slaymaker · Area Manager.</b> Read-only. You appear in the obstacles section — a written development outline and area-level AM openings are being requested of you. This is the routing mechanism working as intended.</div>`
+    : `<div class="fldhint" style="margin:0"><b>Meg Johnson · HR Operations.</b> Read-only. Your access to this individual record was written to the audit log at ${new Date().toLocaleString('en-US')}.</div>`;
+}
+function shareOto(){ toast('Shared with Courtney — record locked, commitments created'); setMode(2); }
+function ackOto(){ toast('Acknowledged — record locked'); setMode(3); }
+
+let tt; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2100);}
+
+document.getElementById('modeTabs').addEventListener('click',e=>{const b=e.target.closest('button'); if(b) setMode(+b.dataset.m);});
+
+/* init */
+renderCommits();
+document.getElementById('roBody2').innerHTML=roBody({showComment:false});
+document.getElementById('roBody3').innerHTML=roBody({showComment:true});
+setV4('chain');
+renderTables();
+setMode(1);
+</script>
+</body>
+</html>

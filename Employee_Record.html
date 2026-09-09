@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC Employee Record · Timeline Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ATC EMPLOYEE RECORD · shared prototype chassis
+   Tokens shared with CVA_Dashboard / CVA_Form_Screens / PPM_Form_Screens
+   Per-page accent is set via --ac / --ac-wash
+   ============================================================ */
+:root{
+  --paper:#e9edf0;
+  --card:#ffffff;
+  --card-2:#f5f7f9;
+  --ink:#16232e;
+  --ink-2:#4d5d6b;
+  --ink-3:#8b99a5;
+  --line:rgba(22,35,46,.12);
+  --line-strong:rgba(22,35,46,.22);
+
+  --atc:#2a97d4;
+  --atc-deep:#12639b;
+  --atc-wash:#e8f4fb;
+
+  --ok:#2e7d4f;   --ok-wash:#e8f4ec;
+  --warn:#b06a1a; --warn-wash:#fbf1e2;
+  --alert:#bf3a2b;--alert-wash:#fbeae7;
+  --ai:#6d4fa1;   --ai-wash:#f1ecf9;
+  --ppm:#0e7c86;  --ppm-wash:#e5f4f5;
+  --oto:#5163b8;  --oto-wash:#eaedfa;
+  --act:#a05a2c;  --act-wash:#f8efe6;
+  --grw:#2e7d4f;  --grw-wash:#e8f4ec;
+  --note:#8b99a5; --note-wash:#eef1f4;
+
+  --r:12px; --rs:7px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --paper:#141a1f; --card:#1e262d; --card-2:#242e36;
+    --ink:#e7edf2; --ink-2:#9fb0bd; --ink-3:#657683;
+    --line:rgba(231,237,242,.10); --line-strong:rgba(231,237,242,.22);
+    --atc:#4db1e8; --atc-deep:#a5d8f5; --atc-wash:#0e2c40;
+    --ok:#5cba8a; --ok-wash:#122b1e;
+    --warn:#e0a054; --warn-wash:#33230d;
+    --alert:#e57a6d; --alert-wash:#361412;
+    --ai:#a98fd6; --ai-wash:#241a36;
+    --ppm:#4cbac3; --ppm-wash:#0c2b2e;
+    --oto:#8b9ae0; --oto-wash:#1a2044;
+    --act:#d69457; --act-wash:#33210f;
+    --grw:#5cba8a; --grw-wash:#122b1e;
+    --note:#8b99a5; --note-wash:#232c34;
+  }
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font); background:var(--paper); color:var(--ink); font-size:14px; -webkit-font-smoothing:antialiased;}
+button{font-family:var(--font);}
+textarea,input,select{font-family:var(--font); color:var(--ink);}
+svg{display:block;}
+
+/* ---------- top chrome ---------- */
+.topbar{display:flex; align-items:center; gap:18px; padding:10px 18px; background:var(--ink); color:#dfe8ee; position:sticky; top:0; z-index:60; flex-wrap:wrap;}
+@media(prefers-color-scheme:dark){ .topbar{background:#0d1319;} }
+.topbar .logo{display:flex; align-items:center; gap:10px;}
+.topbar .logo .mark{width:26px;height:26px;border-radius:6px;background:var(--ac);display:grid;place-items:center;font-weight:900;color:#fff;font-size:12px;}
+.topbar .logo .t{font-weight:800; font-size:14px; letter-spacing:.02em;}
+.topbar .logo .t small{display:block;font-weight:600;font-size:10px;color:#9fb0bd;letter-spacing:.14em;text-transform:uppercase;}
+.modes{display:flex; gap:4px; flex-wrap:wrap;}
+.modes button{border:1px solid rgba(255,255,255,.14); background:transparent; color:#c4d2dc; padding:6px 11px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer; letter-spacing:.02em;}
+.modes button .k{opacity:.55; font-weight:800; margin-right:5px;}
+.modes button.on{background:var(--ac); border-color:var(--ac); color:#fff;}
+.modes button:hover:not(.on){background:rgba(255,255,255,.08);}
+.proto{margin-left:auto; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7d8f9d; font-weight:700;}
+
+/* ---------- subject header ---------- */
+.emphead{display:flex; align-items:center; gap:16px; padding:12px 22px; background:var(--card); border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.emphead .av{width:40px;height:40px;border-radius:50%;background:var(--ac-wash);color:var(--ac);display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0;}
+.emphead .who .nm{font-weight:800; font-size:16px; font-variation-settings:'wdth' 110;}
+.emphead .who .ti{font-size:12px; color:var(--ink-2);}
+.emphead .mode-desc{font-size:12px; color:var(--ink-2); border-left:1px solid var(--line); padding-left:16px; max-width:380px; line-height:1.45;}
+.emphead .mode-desc b{color:var(--ink);}
+.headacts{display:flex; gap:8px; margin-left:auto;}
+
+.btn{border:1px solid var(--line-strong); border-radius:9px; padding:8px 14px; background:var(--card); color:var(--ink); font-size:12.5px; font-weight:700; cursor:pointer;}
+.btn:hover{border-color:var(--ac);}
+.btn.pri{background:var(--ac); border-color:var(--ac); color:#fff;}
+.btn.pri:hover{filter:brightness(1.08);}
+.btn.sm{padding:5px 10px; font-size:11.5px; border-radius:7px;}
+.btn.ghost{background:transparent;}
+.btn.danger{border-color:var(--alert); color:var(--alert);}
+.btn:disabled{opacity:.42; cursor:not-allowed;}
+
+/* ---------- mode sections ---------- */
+.mode{display:none;}
+.mode.on{display:block;}
+.mode-note{margin:14px 22px 0; padding:9px 14px; border-radius:var(--rs); background:var(--ac-wash); color:var(--ac); font-size:12px; font-weight:600; display:flex; gap:8px; align-items:center; line-height:1.45;}
+.mode-note svg{flex-shrink:0;}
+.mode-note.warnband{background:var(--warn-wash); color:var(--warn);}
+.mode-note.okband{background:var(--ok-wash); color:var(--ok);}
+
+/* ---------- generic layout ---------- */
+.centerwrap{max-width:1000px; margin:0 auto; padding:14px 22px 48px;}
+.widewrap{max-width:1360px; margin:0 auto; padding:14px 22px 48px;}
+.cols{display:grid; gap:14px; align-items:start;}
+.cols.c-rail{grid-template-columns:236px 1fr 300px;}
+.cols.c-2{grid-template-columns:1fr 320px;}
+@media(max-width:1180px){ .cols.c-rail{grid-template-columns:1fr;} .cols.c-2{grid-template-columns:1fr;} }
+
+.panelcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
+.panelcard .pchead{display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); background:var(--card-2); flex-wrap:wrap;}
+.panelcard .pchead .t{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2);}
+.panelcard .pchead .sub{font-size:11px; color:var(--ink-3); font-weight:600;}
+.pcbody{padding:14px 16px;}
+.secdiv{padding:7px 16px; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+/* ---------- chips / pills ---------- */
+.tag{font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:99px; white-space:nowrap; display:inline-block;}
+.tag.cva{background:var(--atc-wash); color:var(--atc-deep);}
+.tag.ppm{background:var(--ppm-wash); color:var(--ppm);}
+.tag.oto{background:var(--oto-wash); color:var(--oto);}
+.tag.act{background:var(--act-wash); color:var(--act);}
+.tag.grw{background:var(--grw-wash); color:var(--grw);}
+.tag.note{background:var(--note-wash); color:var(--ink-2);}
+.tag.ok{background:var(--ok-wash); color:var(--ok);}
+.tag.warn{background:var(--warn-wash); color:var(--warn);}
+.tag.alert{background:var(--alert-wash); color:var(--alert);}
+.tag.mute{background:var(--card-2); color:var(--ink-3);}
+.ratepill{min-width:32px; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; text-align:center; display:inline-block;}
+.ratepill.rp{background:var(--ok-wash); color:var(--ok);}
+.ratepill.rpm{background:var(--warn-wash); color:var(--warn);}
+.ratepill.rm{background:var(--alert-wash); color:var(--alert);}
+
+/* ---------- filter rail ---------- */
+.rail{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; position:sticky; top:78px;}
+.rail .rh{padding:10px 14px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); border-bottom:1px solid var(--line); background:var(--card-2);}
+.rail .rgroup{padding:10px 14px; border-bottom:1px solid var(--line);}
+.rail .rgroup:last-child{border-bottom:none;}
+.filt{display:flex; align-items:center; gap:9px; padding:5px 0; cursor:pointer; font-size:12.5px; font-weight:600; color:var(--ink-2); user-select:none;}
+.filt .sw{width:15px;height:15px;border-radius:4px;border:1.6px solid var(--line-strong);display:grid;place-items:center;flex-shrink:0;font-size:10px;color:#fff;font-weight:900;}
+.filt.on .sw{border-color:currentColor;}
+.filt .ct{margin-left:auto; font-size:10.5px; color:var(--ink-3); font-weight:700;}
+.filt.on{color:var(--ink);}
+.filt.dim{opacity:.42; cursor:not-allowed;}
+
+/* ---------- timeline ---------- */
+.tlwrap{position:relative; padding-left:6px;}
+.tlwrap::before{content:''; position:absolute; left:19px; top:8px; bottom:8px; width:2px; background:var(--line);}
+.tlyear{position:relative; margin:18px 0 10px; padding-left:46px; font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);}
+.tlrow{position:relative; padding-left:46px; margin-bottom:10px;}
+.tlrow .node{position:absolute; left:6px; top:14px; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--card); border:2px solid var(--line-strong); z-index:1;}
+.tlrow .node svg{width:14px;height:14px;}
+.tlrow.k-cva .node{border-color:var(--atc-deep); color:var(--atc-deep); background:var(--atc-wash);}
+.tlrow.k-ppm .node{border-color:var(--ppm); color:var(--ppm); background:var(--ppm-wash);}
+.tlrow.k-oto .node{border-color:var(--oto); color:var(--oto); background:var(--oto-wash);}
+.tlrow.k-act .node{border-color:var(--act); color:var(--act); background:var(--act-wash);}
+.tlrow.k-grw .node{border-color:var(--grw); color:var(--grw); background:var(--grw-wash);}
+.tlrow.k-note .node{border-color:var(--note); color:var(--ink-2); background:var(--note-wash);}
+.tlcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:12px 15px; cursor:pointer; transition:border-color .12s, transform .12s;}
+.tlcard:hover{border-color:var(--ac); transform:translateX(1px);}
+.tlcard .th{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+.tlcard .th .ttl{font-size:13.5px; font-weight:800; font-variation-settings:'wdth' 106;}
+.tlcard .th .dt{margin-left:auto; font-size:11px; color:var(--ink-3); font-weight:700;}
+.tlcard .tsum{font-size:12.5px; color:var(--ink-2); line-height:1.55; margin-top:6px;}
+.tlcard .tmeta{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--ink-3); font-weight:600;}
+.tlcard .tmeta b{color:var(--ink-2);}
+.tlcard.priv{border-style:dashed;}
+
+/* hidden-from-view band */
+.hiddenband{margin:10px 0 10px 46px; padding:10px 14px; border:1px dashed var(--line-strong); border-radius:var(--rs); background:var(--card-2); font-size:12px; color:var(--ink-3); line-height:1.5; display:flex; gap:9px; align-items:flex-start;}
+.hiddenband b{color:var(--ink-2);}
+.hiddenband svg{flex-shrink:0; margin-top:1px;}
+
+/* ---------- summary rail ---------- */
+.sumcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; margin-bottom:12px;}
+.sumcard .sh{padding:10px 14px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); border-bottom:1px solid var(--line); background:var(--card-2);}
+.sumcard .sb{padding:12px 14px;}
+.kv{display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; font-size:12.5px;}
+.kv .k{color:var(--ink-3); font-weight:600;}
+.kv .v{font-weight:800;}
+.bigstat{display:flex; align-items:baseline; gap:8px;}
+.bigstat .n{font-size:30px; font-weight:900; font-variation-settings:'wdth' 96; line-height:1;}
+.bigstat .l{font-size:11.5px; color:var(--ink-3); font-weight:700;}
+
+/* ---------- tables ---------- */
+.tbl{width:100%; border-collapse:collapse; font-size:12.5px;}
+.tbl th{text-align:left; padding:8px 12px; font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-bottom:1px solid var(--line); white-space:nowrap;}
+.tbl td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr.clickable{cursor:pointer;}
+.tbl tr.clickable:hover td{background:var(--ac-wash);}
+.tbl td.nm{font-weight:700;}
+.tbl .sub{font-size:11px; color:var(--ink-3); font-weight:600;}
+.tbl tr.locked td{opacity:.5;}
+
+/* ---------- forms ---------- */
+.fld{margin-bottom:13px;}
+.fld label{display:block; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:5px;}
+.fld textarea,.fld input,.fld select{width:100%; border:1px solid var(--line-strong); border-radius:var(--rs); padding:9px 11px; font-size:13px; line-height:1.5; background:var(--card);}
+.fld textarea{min-height:78px; resize:vertical;}
+.fld textarea:focus,.fld input:focus,.fld select:focus{outline:2px solid var(--ac); outline-offset:-1px; border-color:transparent;}
+.fldhint{font-size:11px; color:var(--ink-3); margin-top:5px; line-height:1.45;}
+.roblock{font-size:13px; line-height:1.55; color:var(--ink-2); background:var(--card-2); border-radius:var(--rs); padding:10px 12px;}
+.reqmark{color:var(--alert); font-weight:900;}
+
+/* ---------- commitment / action list ---------- */
+.itemlist{display:flex; flex-direction:column; gap:7px;}
+.iitem{display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border:1px solid var(--line); border-radius:var(--rs); background:var(--card-2); font-size:13px;}
+.iitem .ib{width:16px;height:16px;border-radius:5px;border:1.6px solid var(--line-strong);flex-shrink:0;margin-top:1px;display:grid;place-items:center;cursor:pointer;font-size:10px;font-weight:900;color:#fff;}
+.iitem.done .ib{background:var(--ok); border-color:var(--ok);}
+.iitem.done .it{text-decoration:line-through; color:var(--ink-3);}
+.iitem .it{flex:1; line-height:1.45;}
+.iitem .imeta{font-size:10.5px; color:var(--ink-3); font-weight:700; margin-top:3px; display:flex; gap:9px; flex-wrap:wrap;}
+.iitem .ix{border:none; background:transparent; color:var(--ink-3); cursor:pointer; font-size:14px; font-weight:800; padding:0 3px;}
+.iitem .ix:hover{color:var(--alert);}
+.itemadd{display:flex; gap:7px; margin-top:9px;}
+.itemadd input{flex:1; border:1px solid var(--line-strong); border-radius:var(--rs); padding:8px 11px; font-size:12.5px; background:var(--card);}
+.itemadd input:focus{outline:2px solid var(--ac); outline-offset:-1px;}
+.itemadd input.due{flex:0 0 132px;}
+
+/* ---------- stage track (compact) ---------- */
+.strack{display:flex; align-items:flex-start; gap:0; flex-wrap:nowrap;}
+.sstep{display:flex; flex-direction:column; align-items:center; width:88px; position:relative;}
+.sstep .dot{width:13px;height:13px;border-radius:50%;background:var(--card-2);border:2px solid var(--line-strong);z-index:1;}
+.sstep.done .dot{background:var(--ok);border-color:var(--ok);}
+.sstep.now .dot{background:var(--ac);border-color:var(--ac);box-shadow:0 0 0 4px var(--ac-wash);}
+.sstep.stop .dot{background:var(--alert);border-color:var(--alert);}
+.sstep:not(:first-child)::before{content:''; position:absolute; top:5.5px; right:50%; width:100%; height:2px; background:var(--line);}
+.sstep.done:not(:first-child)::before,.sstep.now:not(:first-child)::before{background:var(--ok);}
+.sstep .tl{font-size:8.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); margin-top:5px; text-align:center; line-height:1.25;}
+.sstep.now .tl{color:var(--ac);}
+.sstep.done .tl{color:var(--ink-2);}
+.sstep.stop .tl{color:var(--alert);}
+
+/* ---------- SLA clock ---------- */
+.sla{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; padding:3px 9px; border-radius:99px;}
+.sla.ok{background:var(--ok-wash); color:var(--ok);}
+.sla.warn{background:var(--warn-wash); color:var(--warn);}
+.sla.breach{background:var(--alert-wash); color:var(--alert);}
+
+/* ---------- signature ---------- */
+.signrow{display:flex; flex-wrap:wrap; gap:10px;}
+.sigcard{flex:1; min-width:210px; border:1px solid var(--line); border-radius:var(--rs); padding:10px 12px; background:var(--card-2);}
+.sigcard .sl{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.sigcard .sig{font-family:'Segoe Script','Bradley Hand',cursive; font-size:17px; margin-top:5px; color:var(--ink);}
+.sigcard .sd{font-size:10.5px; color:var(--ink-3); margin-top:2px;}
+.sigcard.pending{border-style:dashed;}
+.sigcard.pending .sig{color:var(--ink-3); font-family:var(--font); font-size:12px; font-weight:600;}
+
+/* ---------- dialog + toast ---------- */
+.overlay{position:fixed; inset:0; background:rgba(22,35,46,.45); display:none; z-index:100; align-items:center; justify-content:center; padding:20px;}
+.overlay.on{display:flex;}
+.dialog{background:var(--card); border-radius:var(--r); width:520px; max-width:94vw; max-height:88vh; overflow-y:auto; padding:22px; box-shadow:0 18px 50px rgba(0,0,0,.3);}
+.dialog h3{font-size:16px; font-weight:800; font-variation-settings:'wdth' 110;}
+.dialog p.dsub{font-size:12.5px; color:var(--ink-2); margin-top:6px; line-height:1.5;}
+.dialog .dacts{display:flex; gap:8px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap;}
+.dialog .sigbox{margin-top:14px; border:1px dashed var(--line-strong); border-radius:var(--rs); height:74px; display:grid; place-items:center; font-family:'Segoe Script','Bradley Hand',cursive; font-size:22px; background:var(--card-2);}
+.toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:99px; font-size:12.5px; font-weight:700; opacity:0; transition:all .25s; z-index:120; pointer-events:none;}
+@media(prefers-color-scheme:dark){ .toast{background:var(--ac);} }
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* ---------- design-note band (prototype annotation) ---------- */
+.dnote{margin:16px 22px 0; max-width:1360px; border:1px solid var(--line); border-left:4px solid var(--ai); border-radius:10px; background:var(--card); padding:13px 17px; font-size:12.5px; color:var(--ink-2); line-height:1.6;}
+.dnote b{color:var(--ink);}
+.dnote .dh{font-size:9.5px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ai); margin-bottom:5px;}
+.dnote ul{margin:7px 0 0 17px;}
+.dnote li{margin-bottom:3px;}
+
+.empty{padding:30px 16px; text-align:center; color:var(--ink-3); font-size:12.5px;}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ac); outline-offset:2px;}
+
+/* ---- page accent ---- */
+:root{ --ac:#12639b; --ac-wash:#e8f4fb; }
+@media(prefers-color-scheme:dark){ :root{ --ac:#a5d8f5; --ac-wash:#0e2c40; } }
+
+</style>
+</head>
+<body>
+
+<!-- ================= TOP CHROME ================= -->
+<div class="topbar">
+  <div class="logo">
+    <div class="mark">A</div>
+    <div class="t">Employee Record<small>ATC Development · Prototype</small></div>
+  </div>
+  <div class="modes" id="modeTabs">
+    <button data-m="emp" class="on"><span class="k">1</span>Employee · own record</button>
+    <button data-m="sup"><span class="k">2</span>Supervisor · Maria</button>
+    <button data-m="chain"><span class="k">3</span>Chain · Barry (Area Mgr)</button>
+    <button data-m="hr"><span class="k">4</span>HR Operations</button>
+  </div>
+  <div class="proto" style="display:flex;gap:12px;align-items:center;"><a href="CVA_Dashboard.html" style="color:#8fb6cd;text-decoration:none;">Dashboard</a><a href="CVA_Mobile.html" style="color:#8fb6cd;text-decoration:none;">Mobile</a><a href="index.html" style="color:#8fb6cd;text-decoration:none;">All prototypes</a><span>Prototype · sample data</span></div>
+</div>
+
+<!-- ================= SUBJECT HEADER ================= -->
+<div class="emphead">
+  <div class="av">CM</div>
+  <div class="who">
+    <div class="nm">Courtney Murrah</div>
+    <div class="ti">Leasing Consultant · Riverbend · hired Sep 12, 2023 · reports to Maria Gonzales</div>
+  </div>
+  <div class="mode-desc" id="modeDesc"></div>
+  <div class="headacts" id="headActs"></div>
+</div>
+
+<div class="mode-note" id="viewBand"></div>
+
+<div class="widewrap">
+  <div class="cols c-rail">
+
+    <!-- ---------- LEFT: filter rail ---------- -->
+    <div>
+      <div class="rail">
+        <div class="rh">Record types</div>
+        <div class="rgroup" id="filtGroup"></div>
+        <div class="rgroup">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:7px;">Window</div>
+          <select id="winSel" style="width:100%;border:1px solid var(--line-strong);border-radius:var(--rs);padding:7px 9px;font-size:12.5px;background:var(--card);">
+            <option value="99">All history</option>
+            <option value="12" selected>Current CVA cycle (12 mo)</option>
+            <option value="3">Last 90 days</option>
+          </select>
+        </div>
+        <div class="rgroup">
+          <button class="btn sm ghost" style="width:100%" onclick="resetFilt()">Reset filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- CENTER: timeline ---------- -->
+    <div>
+      <div class="panelcard" style="margin-bottom:12px;">
+        <div class="pchead">
+          <span class="t">Record timeline</span>
+          <span class="sub" id="tlCount"></span>
+          <span style="margin-left:auto;" id="tlAdd"></span>
+        </div>
+      </div>
+      <div class="tlwrap" id="timeline"></div>
+    </div>
+
+    <!-- ---------- RIGHT: summary ---------- -->
+    <div id="summary"></div>
+
+  </div>
+</div>
+
+<div class="dnote" style="margin:0 auto 40px;max-width:1360px;">
+  <div class="dh">Prototype design notes · decisions this screen forces</div>
+  <ul>
+    <li><b>The timeline is a read model, not a record.</b> Nothing is authored here — every entry is projected from its owning aggregate (CVA, PPM, SupervisorNote, OneOnOne, ActionItem, GrowthRequest). Switching hats re-runs the visibility predicate; it does not re-query different tables.</li>
+    <li><b>Supervisor notes do not travel up the chain.</b> Barry sees fewer entries than Maria. That follows the locked note rule (current supervisor + HR only) — confirm this is still the intent now that a chain view exists.</li>
+    <li><b>PPM stays invisible to HR until Complete.</b> The Aug 2026 PPM appears for HR only because it completed. An in-flight PPM would not appear at all in hat 4.</li>
+    <li><b>Action items inherit their source's gate.</b> Items promoted from a PPM goal are hidden wherever the PPM is hidden. Standalone and one-on-one items are not gated.</li>
+    <li><b>Open question surfaced by hat 1:</b> the employee sees a record with visible gaps. Do we show "3 entries are not visible to you" (current behaviour, honest) or show nothing at all (concealed)? This is an employment-practice call, not a UI preference.</li>
+  </ul>
+</div>
+
+<!-- ================= DETAIL DIALOG ================= -->
+<div class="overlay" id="ov">
+  <div class="dialog">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span id="dlgTag"></span>
+      <h3 id="dlgTitle">Entry</h3>
+      <span style="margin-left:auto;font-size:11.5px;color:var(--ink-3);font-weight:700;" id="dlgDate"></span>
+    </div>
+    <div id="dlgBody" style="margin-top:14px;"></div>
+    <div class="dacts">
+      <button class="btn ghost" onclick="closeOv()">Close</button>
+      <button class="btn pri" onclick="toast('Would open the owning record');closeOv()">Open full record</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   PEOPLE
+   ============================================================ */
+const P = {
+  emp  : {n:'Courtney Murrah', r:'Leasing Consultant · Riverbend'},
+  sup  : {n:'Maria Gonzales',  r:'Property Manager · Riverbend'},
+  chain: {n:'Barry Slaymaker', r:'Area Manager'},
+  hr   : {n:'Meg Johnson',     r:'Human Resources'}
+};
+
+/* ============================================================
+   RECORD TYPES
+   ============================================================ */
+const KINDS = {
+  cva : {label:'Core Value Assessment', tag:'cva',  ico:'<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/>'},
+  ppm : {label:'Performance Planning',  tag:'ppm',  ico:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/>'},
+  oto : {label:'One-on-one',            tag:'oto',  ico:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
+  act : {label:'Action item',           tag:'act',  ico:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>'},
+  grw : {label:'Growth request',        tag:'grw',  ico:'<path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>'},
+  note: {label:'Supervisor note',       tag:'note', ico:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>'}
+};
+
+/* vis: who may see this entry.  e=employee s=supervisor c=chain h=HR */
+const V = (e,s,c,h)=>({e:!!e,s:!!s,c:!!c,h:!!h});
+
+/* ============================================================
+   SAMPLE RECORD — Courtney Murrah, Sep 2025 → Sep 2026
+   ============================================================ */
+const EVENTS = [
+ {id:'cva25', k:'cva', d:'2025-09-12', t:'CVA 2025 · Complete',
+  s:'Annual Core Value Assessment. Primary Maria Gonzales · Secondary Dana Whitfield · HR Meg Johnson · Executive Caroline Sosebee. Signed by all parties.',
+  meta:['Primary: Maria Gonzales','Executive: Caroline Sosebee'],
+  chips:[['Customers are Valuable','rp'],['Work Should Enhance Life','rp'],['Be Professionals','rpm'],['We Must Work Together','rp'],['Build Value','rpm']],
+  vis:V(1,1,1,1), why:'Completed CVAs are visible to the employee and the full current management chain.'},
+
+ {id:'oto1', k:'oto', d:'2025-10-03', t:'One-on-one · Oct 2025',
+  s:'Reviewed the two "+/-" categories from the CVA. Agreed Courtney would shadow renewal conversations to build confidence on objection handling.',
+  meta:['Author: Maria Gonzales','Acknowledged Oct 4'], st:['Acknowledged','ok'],
+  vis:V(1,1,1,1), why:'A one-on-one becomes visible to the employee and the chain once the supervisor shares it. Draft one-on-ones are supervisor-only.'},
+
+ {id:'act1', k:'act', d:'2025-10-03', t:'Shadow two renewal conversations',
+  s:'Commitment raised in the Oct 2025 one-on-one. Closed Nov 2025.',
+  meta:['Owner: Courtney Murrah','Source: One-on-one · Oct 2025','Closed Nov 7, 2025'], st:['Complete','ok'],
+  vis:V(1,1,1,1), why:'Action items from a shared one-on-one carry that record\u2019s visibility.'},
+
+ {id:'note1', k:'note', d:'2025-11-14', t:'Supervisor note',
+  s:'Handled an escalated resident complaint about the pool gate on her own over the weekend, documented it correctly, and had it to maintenance before I heard about it. Category: Be Professionals, Not Job Holders.',
+  meta:['Author: Maria Gonzales','Category: Be Professionals'],
+  vis:V(0,1,0,1), why:'Supervisor notes are visible to the current supervisor and HR only. The employee never sees them; the chain above the supervisor does not either.'},
+
+ {id:'oto2', k:'oto', d:'2025-12-05', t:'One-on-one · Dec 2025',
+  s:'Year-end check. Occupancy targets hit. Courtney raised interest in more formal training.',
+  meta:['Author: Maria Gonzales','Acknowledged Dec 5'], st:['Acknowledged','ok'],
+  vis:V(1,1,1,1)},
+
+ {id:'grw1', k:'grw', d:'2026-01-09', t:'Growth request · Fair Housing certification',
+  s:'Employee-initiated. "I want to be the person on this property who actually knows Fair Housing cold instead of guessing." Routed to Maria Gonzales, approved with budget Jan 16.',
+  meta:['Raised by: Courtney Murrah','Approved by: Maria Gonzales','Acknowledged in 3 days'], st:['Approved','ok'],
+  vis:V(1,1,1,1), why:'Growth requests are always visible to the employee who raised them. Routing default is the direct supervisor.'},
+
+ {id:'act2', k:'act', d:'2026-01-20', t:'Complete NAA Fair Housing course',
+  s:'Promoted from the approved growth request. Course window runs through Q1.',
+  meta:['Owner: Courtney Murrah','Source: Growth request · Jan 2026','Due Mar 31, 2026'], st:['Complete','ok'],
+  vis:V(1,1,1,1)},
+
+ {id:'note2', k:'note', d:'2026-02-11', t:'Supervisor note',
+  s:'Third time this month she has covered the front desk on short notice without being asked. Worth remembering at CVA time — this is exactly the "We Must Work Together" behaviour I usually cannot evidence.',
+  meta:['Author: Maria Gonzales','Category: We Must Work Together'],
+  vis:V(0,1,0,1)},
+
+ {id:'oto3', k:'oto', d:'2026-02-27', t:'One-on-one · Feb 2026',
+  s:'Fair Housing course in progress. Discussed taking the lead on the spring renewal campaign.',
+  meta:['Author: Maria Gonzales','Acknowledged Feb 28'], st:['Acknowledged','ok'],
+  vis:V(1,1,1,1)},
+
+ {id:'note3', k:'note', d:'2026-04-02', t:'Supervisor note',
+  s:'Renewal campaign launch slipped four days. Not entirely hers — the print vendor was late — but she did not flag the risk to me until the day it was due. Coach on early escalation.',
+  meta:['Author: Maria Gonzales','Category: Be Professionals'],
+  vis:V(0,1,0,1)},
+
+ {id:'oto4', k:'oto', d:'2026-05-15', t:'One-on-one · May 2026',
+  s:'Coached on escalating risk early. Courtney agreed to a Monday status note to me on anything with a deadline she does not control.',
+  meta:['Author: Maria Gonzales','Acknowledged May 16'], st:['Acknowledged','ok'],
+  vis:V(1,1,1,1)},
+
+ {id:'grw2', k:'grw', d:'2026-06-04', t:'Growth request · Assistant Manager track',
+  s:'Employee-initiated. Asking what the path to Assistant Manager looks like and what she would need to demonstrate. Acknowledged by Maria in 2 days; development plan in progress.',
+  meta:['Raised by: Courtney Murrah','Routed to: Maria Gonzales','Acknowledged in 2 days'], st:['In progress','warn'],
+  vis:V(1,1,1,1), why:'Open growth requests are visible up the chain so career interest is not trapped at one supervisor.'},
+
+ {id:'note4', k:'note', d:'2026-07-09', t:'Supervisor note',
+  s:'Ran the property alone for nine days while I was out. Zero escalations to Barry. Delinquency actually went down.',
+  meta:['Author: Maria Gonzales','Category: Build Value'],
+  vis:V(0,1,0,1)},
+
+ {id:'ppm26', k:'ppm', d:'2026-08-13', t:'PPM · Aug 2026 · Complete',
+  s:'Mid-cycle Performance Planning Meeting. Both sides drafted independently; merge released Aug 12; both signatures applied Aug 13. Section 2 goals are the plan of record for the next cycle.',
+  meta:['Employee + Supervisor · both signed','HR visibility began at Complete'], st:['Complete','ok'],
+  vis:V(1,1,1,1), why:'HR has no view of a PPM at any point before Complete. Before Aug 13 this entry did not exist in hat 4.'},
+
+ {id:'act3', k:'act', d:'2026-08-13', t:'Own the Q4 renewal campaign end to end',
+  s:'Promoted from PPM Section 2 · Focus. The signed PPM goal is unchanged; this is a linked tracking item.',
+  meta:['Owner: Courtney Murrah','Source: PPM · Aug 2026','Due Dec 15, 2026'], st:['In progress','warn'],
+  vis:V(1,1,1,1), why:'Gated on the PPM. Visible to HR only because the PPM reached Complete.'},
+
+ {id:'act4', k:'act', d:'2026-08-13', t:'Build a shadowing rotation with maintenance',
+  s:'Promoted from PPM Section 2 · Partnership.',
+  meta:['Owner: Courtney Murrah','Source: PPM · Aug 2026','Due Nov 1, 2026'], st:['Open','mute'],
+  vis:V(1,1,1,1)},
+
+ {id:'oto5', k:'oto', d:'2026-08-28', t:'One-on-one · Aug 2026 · DRAFT',
+  s:'Not yet shared with the employee. Maria is still drafting the follow-up from the PPM meeting.',
+  meta:['Author: Maria Gonzales','Draft — not shared'], st:['Draft','warn'],
+  vis:V(0,1,0,0), why:'A draft one-on-one is visible only to its author. It does not enter the chain or HR view, and the employee is not told it exists.'},
+
+ {id:'act5', k:'act', d:'2026-09-01', t:'Submit September market survey',
+  s:'Standalone item assigned outside any assessment. Now four business days past due.',
+  meta:['Owner: Courtney Murrah','Source: Standalone','Due Sep 4, 2026'], st:['Overdue','alert'],
+  vis:V(1,1,1,1), why:'Standalone action items have no source gate — they are visible on the normal chain rules immediately.'},
+
+ {id:'cva26', k:'cva', d:'2026-09-12', t:'CVA 2026 · With Reviewers',
+  s:'Anniversary-triggered, started by HR Sep 2. Primary and Secondary are drafting independently. Nine active supervisor notes and one completed PPM are available as evidence.',
+  meta:['Primary: Maria Gonzales','Secondary: Barry Slaymaker','Status: With Reviewers'], st:['In flight','warn'],
+  vis:V(0,1,1,1), why:'An in-flight CVA is not visible to the employee. The employee sees the Final only after HR signs.'}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let VIEW='emp';
+let OFF=new Set();          /* switched-off record types */
+let WIN=12;                 /* months */
+
+const NOW=new Date('2026-09-08');
+const fmt=d=>new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const yr =d=>d.slice(0,4);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function inWindow(e){
+  if(WIN>=99) return true;
+  const d=new Date(e.d+'T00:00:00');
+  const cut=new Date(NOW); cut.setMonth(cut.getMonth()-WIN);
+  return d>=cut;
+}
+function canSee(e){ return e.vis[{emp:'e',sup:'s',chain:'c',hr:'h'}[VIEW]]; }
+
+/* ============================================================
+   RENDER — mode chrome
+   ============================================================ */
+const MODEDESC={
+  emp:'<b>Employee hat.</b> Courtney is viewing her own record. Supervisor notes and in-flight assessments are excluded by rule.',
+  sup:'<b>Supervisor hat.</b> Maria is the current direct supervisor. This is the widest working view of the record.',
+  chain:'<b>Chain hat.</b> Barry is two levels up via Graph <code>transitiveReports</code>. Chain access is read-only and excludes supervisor notes.',
+  hr:'<b>HR Operations hat.</b> Meg sees everything except pre-Complete PPMs and unshared one-on-one drafts.'
+};
+const VIEWBAND={
+  emp:['','Viewing as <b>Courtney Murrah</b> · own record · read-only'],
+  sup:['','Viewing as <b>Maria Gonzales</b> · current supervisor of record'],
+  chain:['warnband','Viewing as <b>Barry Slaymaker</b> · Area Manager · read-only chain access, resolved at request time from Graph'],
+  hr:['okband','Viewing as <b>Meg Johnson</b> · HR Operations · access to this record is itself audit-logged']
+};
+
+function renderChrome(){
+  document.querySelectorAll('#modeTabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===VIEW));
+  document.getElementById('modeDesc').innerHTML=MODEDESC[VIEW];
+  const vb=document.getElementById('viewBand');
+  vb.className='mode-note '+VIEWBAND[VIEW][0];
+  vb.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+VIEWBAND[VIEW][1];
+  document.getElementById('headActs').innerHTML =
+    VIEW==='emp' ? '<button class="btn pri" onclick="toast(\'Would open the growth request sheet\')">Raise a growth request</button>'
+  : VIEW==='sup' ? '<button class="btn" onclick="toast(\'Would open Quick Note\')">Quick note</button><button class="btn pri" onclick="toast(\'Would open a new one-on-one\')">Log a one-on-one</button>'
+  : VIEW==='hr'  ? '<button class="btn" onclick="toast(\'Would export the record as PDF\')">Export record</button><button class="btn ghost" onclick="toast(\'Would show the access log for this record\')">Access log</button>'
+  : '<span style="font-size:11.5px;color:var(--ink-3);font-weight:700;">Read-only chain access</span>';
+}
+
+/* ============================================================
+   RENDER — filter rail
+   ============================================================ */
+function renderFilters(){
+  const pool=EVENTS.filter(inWindow);
+  let h='';
+  Object.entries(KINDS).forEach(([k,m])=>{
+    const total  = pool.filter(e=>e.k===k).length;
+    const visible= pool.filter(e=>e.k===k&&canSee(e)).length;
+    const off=OFF.has(k), none=visible===0;
+    h+=`<div class="filt ${off||none?'':'on'} ${none?'dim':''}" ${none?'':`onclick="togKind('${k}')"`} style="color:var(--${m.tag==='note'?'ink-2':m.tag})">
+      <span class="sw" style="${off||none?'':'background:currentColor'}">${off||none?'':'✓'}</span>
+      <span>${m.label}</span>
+      <span class="ct">${visible}${visible<total?` <span style="color:var(--ink-3)">of ${total}</span>`:''}</span>
+    </div>`;
+  });
+  document.getElementById('filtGroup').innerHTML=h;
+}
+function togKind(k){ OFF.has(k)?OFF.delete(k):OFF.add(k); render(); }
+function resetFilt(){ OFF.clear(); WIN=12; document.getElementById('winSel').value='12'; render(); }
+
+/* ============================================================
+   RENDER — timeline
+   ============================================================ */
+function renderTimeline(){
+  const pool=EVENTS.filter(inWindow).slice().sort((a,b)=>b.d.localeCompare(a.d));
+  const shown=pool.filter(e=>canSee(e)&&!OFF.has(e.k));
+  const hiddenByRule=pool.filter(e=>!canSee(e));
+
+  document.getElementById('tlCount').textContent =
+    `${shown.length} entr${shown.length===1?'y':'ies'}` +
+    (hiddenByRule.length?` · ${hiddenByRule.length} withheld by visibility rule`:'');
+
+  if(!shown.length){ document.getElementById('timeline').innerHTML='<div class="empty">No entries match the current filters.</div>'; return; }
+
+  let h='', lastYear='', ruleBandPlaced=false;
+  shown.forEach(e=>{
+    const y=yr(e.d);
+    if(y!==lastYear){ h+=`<div class="tlyear">${y}</div>`; lastYear=y; }
+    const m=KINDS[e.k];
+    h+=`<div class="tlrow k-${e.k}">
+      <div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${m.ico}</svg></div>
+      <div class="tlcard ${e.k==='note'?'priv':''}" onclick="openEv('${e.id}')">
+        <div class="th">
+          <span class="tag ${m.tag}">${m.label}</span>
+          <span class="ttl">${esc(e.t)}</span>
+          ${e.st?`<span class="tag ${e.st[1]}">${e.st[0]}</span>`:''}
+          <span class="dt">${fmt(e.d)}</span>
+        </div>
+        <div class="tsum">${esc(e.s)}</div>
+        ${e.chips?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;">${e.chips.map(c=>`<span class="tag mute" style="font-weight:700">${c[0]} <span class="ratepill ${c[1]}" style="margin-left:4px">${c[1]==='rp'?'+':c[1]==='rpm'?'+/-':'−'}</span></span>`).join('')}</div>`:''}
+        <div class="tmeta">${e.meta.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+      </div>
+    </div>`;
+
+    if(!ruleBandPlaced && hiddenByRule.length){
+      const byKind={};
+      hiddenByRule.forEach(x=>{ byKind[KINDS[x.k].label]=(byKind[KINDS[x.k].label]||0)+1; });
+      h+=`<div class="hiddenband">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><path d="M1 1l22 22"/></svg>
+        <div><b>${hiddenByRule.length} entr${hiddenByRule.length===1?'y is':'ies are'} withheld from this view by rule</b> — ${Object.entries(byKind).map(([k,v])=>`${v} ${k.toLowerCase()}${v>1?'s':''}`).join(', ')}.
+        The count is disclosed; the content is not. Whether the count should be disclosed at all in the employee hat is an open policy question.</div>
+      </div>`;
+      ruleBandPlaced=true;
+    }
+  });
+  if(!ruleBandPlaced && hiddenByRule.length){ /* nothing shown before band */ }
+  document.getElementById('timeline').innerHTML=h;
+}
+
+/* ============================================================
+   RENDER — summary rail
+   ============================================================ */
+function renderSummary(){
+  const vis=EVENTS.filter(canSee);
+  const acts=vis.filter(e=>e.k==='act');
+  const open=acts.filter(e=>e.st&&e.st[0]!=='Complete');
+  const over=acts.filter(e=>e.st&&e.st[0]==='Overdue');
+  const otos=vis.filter(e=>e.k==='oto'&&(!e.st||e.st[0]!=='Draft'));
+  const grws=vis.filter(e=>e.k==='grw');
+  const grwOpen=grws.filter(e=>e.st&&e.st[0]!=='Approved'&&e.st[0]!=='Declined');
+  const notes=vis.filter(e=>e.k==='note');
+
+  /* cadence: months since last shared one-on-one */
+  const lastOto=otos.map(e=>e.d).sort().pop();
+  const gapDays=lastOto?Math.round((NOW-new Date(lastOto+'T00:00:00'))/864e5):null;
+
+  let h='';
+  h+=`<div class="sumcard"><div class="sh">Open commitments</div><div class="sb">
+      <div class="bigstat"><span class="n" style="color:${over.length?'var(--alert)':'var(--ink)'}">${open.length}</span><span class="l">open action item${open.length===1?'':'s'}</span></div>
+      ${over.length?`<div style="margin-top:8px"><span class="tag alert">${over.length} overdue</span></div>`:''}
+      <div class="kv"><span class="k">Closed this cycle</span><span class="v">${acts.length-open.length}</span></div>
+    </div></div>`;
+
+  h+=`<div class="sumcard"><div class="sh">One-on-one cadence</div><div class="sb">
+      <div class="kv"><span class="k">Logged this cycle</span><span class="v">${otos.length}</span></div>
+      <div class="kv"><span class="k">Last shared</span><span class="v">${lastOto?fmt(lastOto):'—'}</span></div>
+      <div class="kv"><span class="k">Days since</span><span class="v" style="color:${gapDays>90?'var(--warn)':'var(--ok)'}">${gapDays!==null?gapDays:'—'}</span></div>
+      <div class="fldhint" style="margin-top:8px">Cadence is displayed, not enforced. Whether a gap becomes a managed metric is an open decision.</div>
+    </div></div>`;
+
+  if(grws.length) h+=`<div class="sumcard"><div class="sh">Growth requests</div><div class="sb">
+      <div class="kv"><span class="k">Raised</span><span class="v">${grws.length}</span></div>
+      <div class="kv"><span class="k">Open</span><span class="v">${grwOpen.length}</span></div>
+      <div class="kv"><span class="k">Slowest acknowledgment</span><span class="v" style="color:var(--ok)">3 days</span></div>
+    </div></div>`;
+
+  if(VIEW==='sup'||VIEW==='hr') h+=`<div class="sumcard"><div class="sh">Evidence for CVA 2026</div><div class="sb">
+      <div class="kv"><span class="k">Active supervisor notes</span><span class="v">${notes.length}</span></div>
+      <div class="kv"><span class="k">Completed PPM</span><span class="v">1</span></div>
+      <div class="kv"><span class="k">Shared one-on-ones</span><span class="v">${otos.length}</span></div>
+      <div class="fldhint" style="margin-top:8px">All of the above are available as reference widgets inside the CVA form. AI consolidation is suggest-only and never assigns a rating.</div>
+    </div></div>`;
+
+  if(VIEW==='chain') h+=`<div class="sumcard"><div class="sh">Chain access</div><div class="sb">
+      <div class="fldhint" style="margin-top:0">Barry sees this record because Courtney is in his transitive report set. Supervisor notes are excluded — those belong to the current direct supervisor and HR. If Barry needs an observation on record, he writes his own note, on his own name.</div>
+    </div></div>`;
+
+  if(VIEW==='emp') h+=`<div class="sumcard"><div class="sh">Your record</div><div class="sb">
+      <div class="fldhint" style="margin-top:0">Everything you can see here, you can export. Entries withheld from you are supervisor observations and assessments still in progress. Nothing is deleted from this record — items retire, they do not disappear.</div>
+      <button class="btn sm" style="width:100%;margin-top:10px" onclick="toast('Would export the employee-visible record')">Export my record</button>
+    </div></div>`;
+
+  document.getElementById('summary').innerHTML=h;
+}
+
+/* ============================================================
+   DIALOG
+   ============================================================ */
+function openEv(id){
+  const e=EVENTS.find(x=>x.id===id); if(!e) return;
+  const m=KINDS[e.k];
+  document.getElementById('dlgTag').innerHTML=`<span class="tag ${m.tag}">${m.label}</span>`;
+  document.getElementById('dlgTitle').textContent=e.t;
+  document.getElementById('dlgDate').textContent=fmt(e.d);
+  let b=`<div class="roblock">${esc(e.s)}</div>`;
+  if(e.chips) b+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">${e.chips.map(c=>`<span class="tag mute" style="font-weight:700">${c[0]} <span class="ratepill ${c[1]}" style="margin-left:4px">${c[1]==='rp'?'+':c[1]==='rpm'?'+/-':'−'}</span></span>`).join('')}</div>`;
+  b+=`<div class="tmeta" style="margin-top:12px">${e.meta.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`;
+  b+=`<div style="margin-top:14px;padding:10px 12px;border-radius:var(--rs);background:var(--ac-wash);font-size:12px;line-height:1.55;color:var(--ac);font-weight:600;">
+      <b>Visibility:</b> ${['e','s','c','h'].filter(x=>e.vis[x]).map(x=>({e:'Employee',s:'Supervisor',c:'Chain',h:'HR'}[x])).join(' · ')||'Author only'}
+      ${e.why?`<div style="margin-top:6px;font-weight:500;">${e.why}</div>`:''}</div>`;
+  document.getElementById('dlgBody').innerHTML=b;
+  document.getElementById('ov').classList.add('on');
+}
+function closeOv(){ document.getElementById('ov').classList.remove('on'); }
+document.getElementById('ov').addEventListener('click',ev=>{ if(ev.target.id==='ov') closeOv(); });
+document.addEventListener('keydown',ev=>{ if(ev.key==='Escape') closeOv(); });
+
+/* ============================================================
+   TOAST + WIRING
+   ============================================================ */
+let tt;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2100); }
+
+document.getElementById('modeTabs').addEventListener('click',ev=>{
+  const b=ev.target.closest('button'); if(!b) return;
+  VIEW=b.dataset.m; OFF.clear(); render();
+});
+document.getElementById('winSel').addEventListener('change',ev=>{ WIN=parseInt(ev.target.value,10); render(); });
+
+function render(){ renderChrome(); renderFilters(); renderTimeline(); renderSummary(); }
+render();
+</script>
+</body>
+</html>

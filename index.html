@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATC CVA · UI Prototypes</title>
+<title>ATC Employee Performance Record · UI Prototypes</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -84,13 +84,26 @@ a:focus-visible{outline:2px solid var(--atc); outline-offset:3px; border-radius:
     <div class="t">ATC Development<small>Information &amp; Systems</small></div>
   </div>
 
-  <h1>CVA Application · UI Prototypes</h1>
+  <h1>Employee Performance Record · UI Prototypes</h1>
   <p class="lede">
-    Design references for the ground-up rebuild of the <b>Core Value Assessment</b> application
-    (React PWA + ASP.NET Core API). These are single-file HTML mockups with sample data —
-    they define layout, interaction, and visual language for the build. They are not connected
-    to any data source and nothing entered here is saved.
+    Design references for the ground-up rebuild of ATC's performance program
+    (React PWA + ASP.NET Core API). The scope now spans six record types on one employee
+    record: <b>CVA</b> (annual, required), <b>PPM</b> (mid-cycle), <b>supervisor notes</b>,
+    <b>one-on-ones</b>, <b>action items</b>, and employee-initiated <b>growth requests</b>.
+    These are single-file HTML mockups with sample data — they define layout, interaction,
+    and visual language, and they exist to force the open decisions listed on each screen.
+    Nothing here is connected to a data source and nothing entered is saved.
   </p>
+
+  <div class="notebox" style="margin-top:22px;border-left-color:#6d4fa1;">
+    <b>Scope note — 01–04 vs 05–07.</b> Prototypes 01 through 04 cover the locked CVA and PPM
+    foundation. Prototypes 05 through 07 are the proposed expansion into a continuous
+    employee record. They are exploratory: the entities they imply
+    (<code>OneOnOne</code>, <code>ActionItem</code>, <code>GrowthRequest</code>, and the
+    <code>EmployeeTimeline</code> read model) are <b>not</b> in
+    <code>CVA_Architecture_And_Data_Model.md</code> v3.1 and are not committed. Each of the
+    three carries a design-note panel naming the decisions it forces.
+  </div>
 
   <div class="cards">
 
@@ -177,6 +190,69 @@ a:focus-visible{outline:2px solid var(--atc); outline-offset:3px; border-radius:
       <div class="go">Open the mobile prototype</div>
     </a>
 
+    <a class="proto" href="Employee_Record.html" style="border-left:3px solid #6d4fa1;">
+      <div class="ph">
+        <span class="num" style="background:#f1ecf9;color:#6d4fa1;">05</span>
+        <h2>Employee Record · Timeline</h2>
+        <span class="file">Employee_Record.html</span>
+      </div>
+      <p>
+        The proposed spine. One chronological record per employee, projecting every record type —
+        CVA, PPM, supervisor notes, one-on-ones, action items, growth requests — through a single
+        visibility predicate. Four viewer hats: <b>Employee</b>, <b>Supervisor</b>,
+        <b>Chain</b> (Area Manager, via <code>transitiveReports</code>), and <b>HR Operations</b>.
+        Switching hats re-runs the predicate and shows what each role is withheld.
+      </p>
+      <ul>
+        <li>Read model, not an aggregate</li><li>Per-hat visibility</li>
+        <li>Notes excluded from the chain</li><li>PPM hidden from HR pre-Complete</li>
+        <li>Action items inherit their source gate</li>
+      </ul>
+      <div class="go">Open the employee record prototype</div>
+    </a>
+
+    <a class="proto" href="OneOnOne_Screens.html" style="border-left:3px solid #5163b8;">
+      <div class="ph">
+        <span class="num" style="background:#eaedfa;color:#5163b8;">06</span>
+        <h2>One-on-One Screens</h2>
+        <span class="file">OneOnOne_Screens.html</span>
+      </div>
+      <p>
+        Documented one-on-ones as a shared, employee-acknowledged record. Five modes:
+        <b>Supervisor Drafting</b> (with a private supervisor-note panel that writes to the notes
+        log, not to this record), <b>Employee Review</b> (acknowledge ≠ agree, plus a permanent
+        employee comment), <b>Acknowledged &amp; Locked</b>, <b>Chain &amp; HR View</b>, and a
+        <b>Cadence Tracker</b> that makes the "does this become a metric" question explicit.
+      </p>
+      <ul>
+        <li>Draft is author-only</li><li>Commitments → action items</li>
+        <li>Private note escape hatch</li><li>Amendments, never edits</li>
+        <li>Cadence policy options</li>
+      </ul>
+      <div class="go">Open the one-on-one prototype</div>
+    </a>
+
+    <a class="proto" href="Action_Items.html" style="border-left:3px solid #a05a2c;">
+      <div class="ph">
+        <span class="num" style="background:#f8efe6;color:#a05a2c;">07</span>
+        <h2>Action Items &amp; Growth Requests</h2>
+        <span class="file">Action_Items.html</span>
+      </div>
+      <p>
+        One polymorphic action item with a permanent <code>SourceType</code>, plus the
+        employee-initiated growth request. Four hats: <b>Mine</b>, <b>My Team</b> (including the
+        items the supervisor owes the employee), <b>HR Operations</b> (with source-gated rows shown
+        as counts only), and the <b>Growth Request lifecycle</b> — where a decline is blocked
+        without a written reason, server-side.
+      </p>
+      <ul>
+        <li>Polymorphic source</li><li>Supervisor-owned items in the same list</li>
+        <li>5-day acknowledgment SLA</li><li>Decline requires a reason</li>
+        <li>No hidden action items</li>
+      </ul>
+      <div class="go">Open the action items prototype</div>
+    </a>
+
   </div>
 
   <div class="notebox">
@@ -187,9 +263,18 @@ a:focus-visible{outline:2px solid var(--atc); outline-offset:3px; border-radius:
     lifecycle transition is an explicit, signed human action · PPM sides are drafted
     independently and sealed until the supervisor releases the merge after the in-person
     meeting · the PPM has no ratings · HR has no visibility into a PPM before Complete.
+    <br><br>
+    <b>Proposed additions under debate (05–07):</b> the timeline is a projection and is never
+    written to directly · supervisor notes stay with the current direct supervisor and HR and do
+    not travel up the chain · a one-on-one draft is invisible to everyone but its author · a shared
+    one-on-one is locked and corrected only by appended amendment · an action item inherits the
+    visibility gate of whatever created it · standalone action items are visible to the employee
+    immediately, so no action item is ever hidden from its owner · a growth request cannot be
+    declined without a written reason, enforced at the API · acknowledgment and decision are
+    separate obligations with separate clocks.
   </div>
 
-  <div class="foot">ATC CVA Rebuild · UI prototype set · sample data only</div>
+  <div class="foot">ATC Employee Performance Record · UI prototype set · sample data only</div>
 
 </div>
 </body>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC Action Items & Growth Requests · Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ATC EMPLOYEE RECORD · shared prototype chassis
+   Tokens shared with CVA_Dashboard / CVA_Form_Screens / PPM_Form_Screens
+   Per-page accent is set via --ac / --ac-wash
+   ============================================================ */
+:root{
+  --paper:#e9edf0;
+  --card:#ffffff;
+  --card-2:#f5f7f9;
+  --ink:#16232e;
+  --ink-2:#4d5d6b;
+  --ink-3:#8b99a5;
+  --line:rgba(22,35,46,.12);
+  --line-strong:rgba(22,35,46,.22);
+
+  --atc:#2a97d4;
+  --atc-deep:#12639b;
+  --atc-wash:#e8f4fb;
+
+  --ok:#2e7d4f;   --ok-wash:#e8f4ec;
+  --warn:#b06a1a; --warn-wash:#fbf1e2;
+  --alert:#bf3a2b;--alert-wash:#fbeae7;
+  --ai:#6d4fa1;   --ai-wash:#f1ecf9;
+  --ppm:#0e7c86;  --ppm-wash:#e5f4f5;
+  --oto:#5163b8;  --oto-wash:#eaedfa;
+  --act:#a05a2c;  --act-wash:#f8efe6;
+  --grw:#2e7d4f;  --grw-wash:#e8f4ec;
+  --note:#8b99a5; --note-wash:#eef1f4;
+
+  --r:12px; --rs:7px;
+  --font:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --paper:#141a1f; --card:#1e262d; --card-2:#242e36;
+    --ink:#e7edf2; --ink-2:#9fb0bd; --ink-3:#657683;
+    --line:rgba(231,237,242,.10); --line-strong:rgba(231,237,242,.22);
+    --atc:#4db1e8; --atc-deep:#a5d8f5; --atc-wash:#0e2c40;
+    --ok:#5cba8a; --ok-wash:#122b1e;
+    --warn:#e0a054; --warn-wash:#33230d;
+    --alert:#e57a6d; --alert-wash:#361412;
+    --ai:#a98fd6; --ai-wash:#241a36;
+    --ppm:#4cbac3; --ppm-wash:#0c2b2e;
+    --oto:#8b9ae0; --oto-wash:#1a2044;
+    --act:#d69457; --act-wash:#33210f;
+    --grw:#5cba8a; --grw-wash:#122b1e;
+    --note:#8b99a5; --note-wash:#232c34;
+  }
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{font-family:var(--font); background:var(--paper); color:var(--ink); font-size:14px; -webkit-font-smoothing:antialiased;}
+button{font-family:var(--font);}
+textarea,input,select{font-family:var(--font); color:var(--ink);}
+svg{display:block;}
+
+/* ---------- top chrome ---------- */
+.topbar{display:flex; align-items:center; gap:18px; padding:10px 18px; background:var(--ink); color:#dfe8ee; position:sticky; top:0; z-index:60; flex-wrap:wrap;}
+@media(prefers-color-scheme:dark){ .topbar{background:#0d1319;} }
+.topbar .logo{display:flex; align-items:center; gap:10px;}
+.topbar .logo .mark{width:26px;height:26px;border-radius:6px;background:var(--ac);display:grid;place-items:center;font-weight:900;color:#fff;font-size:12px;}
+.topbar .logo .t{font-weight:800; font-size:14px; letter-spacing:.02em;}
+.topbar .logo .t small{display:block;font-weight:600;font-size:10px;color:#9fb0bd;letter-spacing:.14em;text-transform:uppercase;}
+.modes{display:flex; gap:4px; flex-wrap:wrap;}
+.modes button{border:1px solid rgba(255,255,255,.14); background:transparent; color:#c4d2dc; padding:6px 11px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer; letter-spacing:.02em;}
+.modes button .k{opacity:.55; font-weight:800; margin-right:5px;}
+.modes button.on{background:var(--ac); border-color:var(--ac); color:#fff;}
+.modes button:hover:not(.on){background:rgba(255,255,255,.08);}
+.proto{margin-left:auto; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7d8f9d; font-weight:700;}
+
+/* ---------- subject header ---------- */
+.emphead{display:flex; align-items:center; gap:16px; padding:12px 22px; background:var(--card); border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.emphead .av{width:40px;height:40px;border-radius:50%;background:var(--ac-wash);color:var(--ac);display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0;}
+.emphead .who .nm{font-weight:800; font-size:16px; font-variation-settings:'wdth' 110;}
+.emphead .who .ti{font-size:12px; color:var(--ink-2);}
+.emphead .mode-desc{font-size:12px; color:var(--ink-2); border-left:1px solid var(--line); padding-left:16px; max-width:380px; line-height:1.45;}
+.emphead .mode-desc b{color:var(--ink);}
+.headacts{display:flex; gap:8px; margin-left:auto;}
+
+.btn{border:1px solid var(--line-strong); border-radius:9px; padding:8px 14px; background:var(--card); color:var(--ink); font-size:12.5px; font-weight:700; cursor:pointer;}
+.btn:hover{border-color:var(--ac);}
+.btn.pri{background:var(--ac); border-color:var(--ac); color:#fff;}
+.btn.pri:hover{filter:brightness(1.08);}
+.btn.sm{padding:5px 10px; font-size:11.5px; border-radius:7px;}
+.btn.ghost{background:transparent;}
+.btn.danger{border-color:var(--alert); color:var(--alert);}
+.btn:disabled{opacity:.42; cursor:not-allowed;}
+
+/* ---------- mode sections ---------- */
+.mode{display:none;}
+.mode.on{display:block;}
+.mode-note{margin:14px 22px 0; padding:9px 14px; border-radius:var(--rs); background:var(--ac-wash); color:var(--ac); font-size:12px; font-weight:600; display:flex; gap:8px; align-items:center; line-height:1.45;}
+.mode-note svg{flex-shrink:0;}
+.mode-note.warnband{background:var(--warn-wash); color:var(--warn);}
+.mode-note.okband{background:var(--ok-wash); color:var(--ok);}
+
+/* ---------- generic layout ---------- */
+.centerwrap{max-width:1000px; margin:0 auto; padding:14px 22px 48px;}
+.widewrap{max-width:1360px; margin:0 auto; padding:14px 22px 48px;}
+.cols{display:grid; gap:14px; align-items:start;}
+.cols.c-rail{grid-template-columns:236px 1fr 300px;}
+.cols.c-2{grid-template-columns:1fr 320px;}
+@media(max-width:1180px){ .cols.c-rail{grid-template-columns:1fr;} .cols.c-2{grid-template-columns:1fr;} }
+
+.panelcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
+.panelcard .pchead{display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid var(--line); background:var(--card-2); flex-wrap:wrap;}
+.panelcard .pchead .t{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2);}
+.panelcard .pchead .sub{font-size:11px; color:var(--ink-3); font-weight:600;}
+.pcbody{padding:14px 16px;}
+.secdiv{padding:7px 16px; font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+/* ---------- chips / pills ---------- */
+.tag{font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:99px; white-space:nowrap; display:inline-block;}
+.tag.cva{background:var(--atc-wash); color:var(--atc-deep);}
+.tag.ppm{background:var(--ppm-wash); color:var(--ppm);}
+.tag.oto{background:var(--oto-wash); color:var(--oto);}
+.tag.act{background:var(--act-wash); color:var(--act);}
+.tag.grw{background:var(--grw-wash); color:var(--grw);}
+.tag.note{background:var(--note-wash); color:var(--ink-2);}
+.tag.ok{background:var(--ok-wash); color:var(--ok);}
+.tag.warn{background:var(--warn-wash); color:var(--warn);}
+.tag.alert{background:var(--alert-wash); color:var(--alert);}
+.tag.mute{background:var(--card-2); color:var(--ink-3);}
+.ratepill{min-width:32px; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; text-align:center; display:inline-block;}
+.ratepill.rp{background:var(--ok-wash); color:var(--ok);}
+.ratepill.rpm{background:var(--warn-wash); color:var(--warn);}
+.ratepill.rm{background:var(--alert-wash); color:var(--alert);}
+
+/* ---------- filter rail ---------- */
+.rail{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; position:sticky; top:78px;}
+.rail .rh{padding:10px 14px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); border-bottom:1px solid var(--line); background:var(--card-2);}
+.rail .rgroup{padding:10px 14px; border-bottom:1px solid var(--line);}
+.rail .rgroup:last-child{border-bottom:none;}
+.filt{display:flex; align-items:center; gap:9px; padding:5px 0; cursor:pointer; font-size:12.5px; font-weight:600; color:var(--ink-2); user-select:none;}
+.filt .sw{width:15px;height:15px;border-radius:4px;border:1.6px solid var(--line-strong);display:grid;place-items:center;flex-shrink:0;font-size:10px;color:#fff;font-weight:900;}
+.filt.on .sw{border-color:currentColor;}
+.filt .ct{margin-left:auto; font-size:10.5px; color:var(--ink-3); font-weight:700;}
+.filt.on{color:var(--ink);}
+.filt.dim{opacity:.42; cursor:not-allowed;}
+
+/* ---------- timeline ---------- */
+.tlwrap{position:relative; padding-left:6px;}
+.tlwrap::before{content:''; position:absolute; left:19px; top:8px; bottom:8px; width:2px; background:var(--line);}
+.tlyear{position:relative; margin:18px 0 10px; padding-left:46px; font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);}
+.tlrow{position:relative; padding-left:46px; margin-bottom:10px;}
+.tlrow .node{position:absolute; left:6px; top:14px; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--card); border:2px solid var(--line-strong); z-index:1;}
+.tlrow .node svg{width:14px;height:14px;}
+.tlrow.k-cva .node{border-color:var(--atc-deep); color:var(--atc-deep); background:var(--atc-wash);}
+.tlrow.k-ppm .node{border-color:var(--ppm); color:var(--ppm); background:var(--ppm-wash);}
+.tlrow.k-oto .node{border-color:var(--oto); color:var(--oto); background:var(--oto-wash);}
+.tlrow.k-act .node{border-color:var(--act); color:var(--act); background:var(--act-wash);}
+.tlrow.k-grw .node{border-color:var(--grw); color:var(--grw); background:var(--grw-wash);}
+.tlrow.k-note .node{border-color:var(--note); color:var(--ink-2); background:var(--note-wash);}
+.tlcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:12px 15px; cursor:pointer; transition:border-color .12s, transform .12s;}
+.tlcard:hover{border-color:var(--ac); transform:translateX(1px);}
+.tlcard .th{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+.tlcard .th .ttl{font-size:13.5px; font-weight:800; font-variation-settings:'wdth' 106;}
+.tlcard .th .dt{margin-left:auto; font-size:11px; color:var(--ink-3); font-weight:700;}
+.tlcard .tsum{font-size:12.5px; color:var(--ink-2); line-height:1.55; margin-top:6px;}
+.tlcard .tmeta{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--ink-3); font-weight:600;}
+.tlcard .tmeta b{color:var(--ink-2);}
+.tlcard.priv{border-style:dashed;}
+
+/* hidden-from-view band */
+.hiddenband{margin:10px 0 10px 46px; padding:10px 14px; border:1px dashed var(--line-strong); border-radius:var(--rs); background:var(--card-2); font-size:12px; color:var(--ink-3); line-height:1.5; display:flex; gap:9px; align-items:flex-start;}
+.hiddenband b{color:var(--ink-2);}
+.hiddenband svg{flex-shrink:0; margin-top:1px;}
+
+/* ---------- summary rail ---------- */
+.sumcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; margin-bottom:12px;}
+.sumcard .sh{padding:10px 14px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); border-bottom:1px solid var(--line); background:var(--card-2);}
+.sumcard .sb{padding:12px 14px;}
+.kv{display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; font-size:12.5px;}
+.kv .k{color:var(--ink-3); font-weight:600;}
+.kv .v{font-weight:800;}
+.bigstat{display:flex; align-items:baseline; gap:8px;}
+.bigstat .n{font-size:30px; font-weight:900; font-variation-settings:'wdth' 96; line-height:1;}
+.bigstat .l{font-size:11.5px; color:var(--ink-3); font-weight:700;}
+
+/* ---------- tables ---------- */
+.tbl{width:100%; border-collapse:collapse; font-size:12.5px;}
+.tbl th{text-align:left; padding:8px 12px; font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); background:var(--card-2); border-bottom:1px solid var(--line); white-space:nowrap;}
+.tbl td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr.clickable{cursor:pointer;}
+.tbl tr.clickable:hover td{background:var(--ac-wash);}
+.tbl td.nm{font-weight:700;}
+.tbl .sub{font-size:11px; color:var(--ink-3); font-weight:600;}
+.tbl tr.locked td{opacity:.5;}
+
+/* ---------- forms ---------- */
+.fld{margin-bottom:13px;}
+.fld label{display:block; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:5px;}
+.fld textarea,.fld input,.fld select{width:100%; border:1px solid var(--line-strong); border-radius:var(--rs); padding:9px 11px; font-size:13px; line-height:1.5; background:var(--card);}
+.fld textarea{min-height:78px; resize:vertical;}
+.fld textarea:focus,.fld input:focus,.fld select:focus{outline:2px solid var(--ac); outline-offset:-1px; border-color:transparent;}
+.fldhint{font-size:11px; color:var(--ink-3); margin-top:5px; line-height:1.45;}
+.roblock{font-size:13px; line-height:1.55; color:var(--ink-2); background:var(--card-2); border-radius:var(--rs); padding:10px 12px;}
+.reqmark{color:var(--alert); font-weight:900;}
+
+/* ---------- commitment / action list ---------- */
+.itemlist{display:flex; flex-direction:column; gap:7px;}
+.iitem{display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border:1px solid var(--line); border-radius:var(--rs); background:var(--card-2); font-size:13px;}
+.iitem .ib{width:16px;height:16px;border-radius:5px;border:1.6px solid var(--line-strong);flex-shrink:0;margin-top:1px;display:grid;place-items:center;cursor:pointer;font-size:10px;font-weight:900;color:#fff;}
+.iitem.done .ib{background:var(--ok); border-color:var(--ok);}
+.iitem.done .it{text-decoration:line-through; color:var(--ink-3);}
+.iitem .it{flex:1; line-height:1.45;}
+.iitem .imeta{font-size:10.5px; color:var(--ink-3); font-weight:700; margin-top:3px; display:flex; gap:9px; flex-wrap:wrap;}
+.iitem .ix{border:none; background:transparent; color:var(--ink-3); cursor:pointer; font-size:14px; font-weight:800; padding:0 3px;}
+.iitem .ix:hover{color:var(--alert);}
+.itemadd{display:flex; gap:7px; margin-top:9px;}
+.itemadd input{flex:1; border:1px solid var(--line-strong); border-radius:var(--rs); padding:8px 11px; font-size:12.5px; background:var(--card);}
+.itemadd input:focus{outline:2px solid var(--ac); outline-offset:-1px;}
+.itemadd input.due{flex:0 0 132px;}
+
+/* ---------- stage track (compact) ---------- */
+.strack{display:flex; align-items:flex-start; gap:0; flex-wrap:nowrap;}
+.sstep{display:flex; flex-direction:column; align-items:center; width:88px; position:relative;}
+.sstep .dot{width:13px;height:13px;border-radius:50%;background:var(--card-2);border:2px solid var(--line-strong);z-index:1;}
+.sstep.done .dot{background:var(--ok);border-color:var(--ok);}
+.sstep.now .dot{background:var(--ac);border-color:var(--ac);box-shadow:0 0 0 4px var(--ac-wash);}
+.sstep.stop .dot{background:var(--alert);border-color:var(--alert);}
+.sstep:not(:first-child)::before{content:''; position:absolute; top:5.5px; right:50%; width:100%; height:2px; background:var(--line);}
+.sstep.done:not(:first-child)::before,.sstep.now:not(:first-child)::before{background:var(--ok);}
+.sstep .tl{font-size:8.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); margin-top:5px; text-align:center; line-height:1.25;}
+.sstep.now .tl{color:var(--ac);}
+.sstep.done .tl{color:var(--ink-2);}
+.sstep.stop .tl{color:var(--alert);}
+
+/* ---------- SLA clock ---------- */
+.sla{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; padding:3px 9px; border-radius:99px;}
+.sla.ok{background:var(--ok-wash); color:var(--ok);}
+.sla.warn{background:var(--warn-wash); color:var(--warn);}
+.sla.breach{background:var(--alert-wash); color:var(--alert);}
+
+/* ---------- signature ---------- */
+.signrow{display:flex; flex-wrap:wrap; gap:10px;}
+.sigcard{flex:1; min-width:210px; border:1px solid var(--line); border-radius:var(--rs); padding:10px 12px; background:var(--card-2);}
+.sigcard .sl{font-size:9.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);}
+.sigcard .sig{font-family:'Segoe Script','Bradley Hand',cursive; font-size:17px; margin-top:5px; color:var(--ink);}
+.sigcard .sd{font-size:10.5px; color:var(--ink-3); margin-top:2px;}
+.sigcard.pending{border-style:dashed;}
+.sigcard.pending .sig{color:var(--ink-3); font-family:var(--font); font-size:12px; font-weight:600;}
+
+/* ---------- dialog + toast ---------- */
+.overlay{position:fixed; inset:0; background:rgba(22,35,46,.45); display:none; z-index:100; align-items:center; justify-content:center; padding:20px;}
+.overlay.on{display:flex;}
+.dialog{background:var(--card); border-radius:var(--r); width:520px; max-width:94vw; max-height:88vh; overflow-y:auto; padding:22px; box-shadow:0 18px 50px rgba(0,0,0,.3);}
+.dialog h3{font-size:16px; font-weight:800; font-variation-settings:'wdth' 110;}
+.dialog p.dsub{font-size:12.5px; color:var(--ink-2); margin-top:6px; line-height:1.5;}
+.dialog .dacts{display:flex; gap:8px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap;}
+.dialog .sigbox{margin-top:14px; border:1px dashed var(--line-strong); border-radius:var(--rs); height:74px; display:grid; place-items:center; font-family:'Segoe Script','Bradley Hand',cursive; font-size:22px; background:var(--card-2);}
+.toast{position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:#fff; padding:10px 18px; border-radius:99px; font-size:12.5px; font-weight:700; opacity:0; transition:all .25s; z-index:120; pointer-events:none;}
+@media(prefers-color-scheme:dark){ .toast{background:var(--ac);} }
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+/* ---------- design-note band (prototype annotation) ---------- */
+.dnote{margin:16px 22px 0; max-width:1360px; border:1px solid var(--line); border-left:4px solid var(--ai); border-radius:10px; background:var(--card); padding:13px 17px; font-size:12.5px; color:var(--ink-2); line-height:1.6;}
+.dnote b{color:var(--ink);}
+.dnote .dh{font-size:9.5px; font-weight:800; letter-spacing:.13em; text-transform:uppercase; color:var(--ai); margin-bottom:5px;}
+.dnote ul{margin:7px 0 0 17px;}
+.dnote li{margin-bottom:3px;}
+
+.empty{padding:30px 16px; text-align:center; color:var(--ink-3); font-size:12.5px;}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ac); outline-offset:2px;}
+
+/* ---- page accent ---- */
+:root{ --ac:#a05a2c; --ac-wash:#f8efe6; }
+@media(prefers-color-scheme:dark){ :root{ --ac:#d69457; --ac-wash:#33210f; } }
+
+</style>
+</head>
+<body>
+
+<!-- ================= TOP CHROME ================= -->
+<div class="topbar">
+  <div class="logo">
+    <div class="mark">A</div>
+    <div class="t">Action Items &amp; Growth<small>ATC Development · Prototype</small></div>
+  </div>
+  <div class="modes" id="modeTabs">
+    <button data-m="1" class="on"><span class="k">1</span>Mine</button>
+    <button data-m="2"><span class="k">2</span>My Team</button>
+    <button data-m="3"><span class="k">3</span>HR Operations</button>
+    <button data-m="4"><span class="k">4</span>Growth Request · lifecycle</button>
+  </div>
+  <div class="proto" style="display:flex;gap:12px;align-items:center;"><a href="CVA_Dashboard.html" style="color:#8fb6cd;text-decoration:none;">Dashboard</a><a href="CVA_Mobile.html" style="color:#8fb6cd;text-decoration:none;">Mobile</a><a href="index.html" style="color:#8fb6cd;text-decoration:none;">All prototypes</a><span>Prototype · sample data</span></div>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="emphead">
+  <div class="av" id="hAv">CM</div>
+  <div class="who">
+    <div class="nm" id="hName">Courtney Murrah</div>
+    <div class="ti" id="hTitle">Leasing Consultant · Riverbend</div>
+  </div>
+  <div class="mode-desc" id="modeDesc"></div>
+  <div class="headacts" id="headActs"></div>
+</div>
+
+<!-- ================================================================
+     MODE 1 · MINE
+     ================================================================ -->
+<section class="mode on" id="m1">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Every commitment made about you or by you, from every source, in one list. An item's <b>source</b> is permanent — it always points back at the CVA, PPM, one-on-one, or growth request that created it.
+  </div>
+  <div class="widewrap">
+    <div class="cols c-2">
+      <div id="mineCol"></div>
+      <div>
+        <div class="sumcard">
+          <div class="sh">Your commitments</div>
+          <div class="sb">
+            <div class="bigstat"><span class="n" style="color:var(--alert)">1</span><span class="l">overdue</span></div>
+            <div class="kv"><span class="k">Open</span><span class="v">3</span></div>
+            <div class="kv"><span class="k">Closed this cycle</span><span class="v">4</span></div>
+            <div class="kv"><span class="k">Close rate</span><span class="v" style="color:var(--ok)">80%</span></div>
+            <div class="fldhint" style="margin-top:9px">Close rate is carried into the CVA as evidence, not as a rating. A missed item with a written reason reads differently from a missed item with silence.</div>
+          </div>
+        </div>
+
+        <div class="sumcard" style="border-left:3px solid var(--grw);">
+          <div class="sh" style="color:var(--grw)">Your growth requests</div>
+          <div class="sb">
+            <div class="itemlist">
+              <div class="iitem" style="cursor:pointer" onclick="setMode(4)"><span class="ib"></span><div style="flex:1"><div class="it">Assistant Manager track</div><div class="imeta"><span>Raised Jun 4</span><span class="tag warn">In progress</span></div></div></div>
+              <div class="iitem done"><span class="ib">✓</span><div style="flex:1"><div class="it">Fair Housing certification</div><div class="imeta"><span>Raised Jan 9</span><span class="tag ok">Approved</span></div></div></div>
+            </div>
+            <button class="btn pri sm" style="width:100%;margin-top:11px" onclick="openGrw()">Raise a growth request</button>
+            <div class="fldhint" style="margin-top:9px">Routed to your supervisor by default. Acknowledgment is owed within <b>5 business days</b>; after that it escalates automatically.</div>
+          </div>
+        </div>
+
+        <div class="sumcard">
+          <div class="sh">Raised by you for others</div>
+          <div class="sb">
+            <div class="empty" style="padding:14px 0">Nothing yet. Any employee can raise an action item for themselves; only a supervisor can assign one to someone else.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 2 · MY TEAM
+     ================================================================ -->
+<section class="mode" id="m2">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>
+    Everything owed across your reports, including the items <b>you</b> owe them. Supervisor-owned commitments are shown in the same list on purpose — the accountability runs both directions.
+  </div>
+  <div class="widewrap">
+    <div class="cols c-2">
+      <div>
+        <div class="panelcard" style="margin-bottom:14px;">
+          <div class="pchead"><span class="t">Open items · Riverbend</span><span class="sub" id="teamCount"></span>
+            <span style="margin-left:auto;display:flex;gap:5px;" id="teamFilt"></span></div>
+          <table class="tbl" id="teamTbl"></table>
+        </div>
+        <div class="panelcard">
+          <div class="pchead"><span class="t">Growth requests routed to you</span>
+            <span style="margin-left:auto"><span class="sla warn">1 approaching SLA</span></span></div>
+          <table class="tbl" id="grwTbl"></table>
+        </div>
+      </div>
+      <div>
+        <div class="sumcard"><div class="sh">Team commitments</div><div class="sb">
+          <div class="bigstat"><span class="n" style="color:var(--alert)">3</span><span class="l">overdue across 6 reports</span></div>
+          <div class="kv"><span class="k">Open, owned by team</span><span class="v">11</span></div>
+          <div class="kv"><span class="k">Open, owned by you</span><span class="v" style="color:var(--warn)">4</span></div>
+          <div class="kv"><span class="k">Team close rate</span><span class="v">76%</span></div>
+        </div></div>
+        <div class="sumcard"><div class="sh">By source</div><div class="sb">
+          <div class="kv"><span class="k"><span class="tag oto">One-on-one</span></span><span class="v">7</span></div>
+          <div class="kv"><span class="k"><span class="tag ppm">PPM goal</span></span><span class="v">4</span></div>
+          <div class="kv"><span class="k"><span class="tag cva">CVA follow-up</span></span><span class="v">2</span></div>
+          <div class="kv"><span class="k"><span class="tag grw">Growth request</span></span><span class="v">1</span></div>
+          <div class="kv"><span class="k"><span class="tag mute">Standalone</span></span><span class="v">1</span></div>
+          <div class="fldhint" style="margin-top:9px">A team whose items are all standalone is not running the process. A team with no standalone items is probably not doing day-to-day management in the system at all. Both patterns are worth seeing.</div>
+        </div></div>
+        <div class="sumcard" style="border-left:3px solid var(--ai);">
+          <div class="sh" style="color:var(--ai)">Open decision</div>
+          <div class="sb"><div class="fldhint" style="margin:0">Can a supervisor assign a standalone action item with no source record? This prototype says yes — it is how real work gets tracked. The cost is that it becomes possible to build a documentation trail on an employee outside any conversation they were part of. Mitigation implemented here: <b>standalone items are always visible to the employee immediately.</b> There is no such thing as a hidden action item.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 3 · HR OPERATIONS
+     ================================================================ -->
+<section class="mode" id="m3">
+  <div class="mode-note okband">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>
+    Organisation-wide. Items sourced from a record HR cannot yet see are listed as withheld rows — the count is visible, the content is not. That is the source-gate rule holding.
+  </div>
+  <div class="widewrap">
+    <div class="cols c-2">
+      <div>
+        <div class="panelcard" style="margin-bottom:14px;">
+          <div class="pchead"><span class="t">Growth request queue</span><span class="sub">org-wide · SLA 5 business days to acknowledge</span>
+            <span style="margin-left:auto"><span class="sla breach">2 breached</span></span></div>
+          <table class="tbl" id="hrGrwTbl"></table>
+        </div>
+        <div class="panelcard" style="margin-bottom:14px;">
+          <div class="pchead"><span class="t">Overdue items · all properties</span><span class="sub">14 open past due</span></div>
+          <table class="tbl" id="hrOverTbl"></table>
+        </div>
+        <div class="panelcard">
+          <div class="pchead"><span class="t">Withheld from HR by source gate</span><span class="sub">visible as counts only</span></div>
+          <table class="tbl" id="hrGateTbl"></table>
+        </div>
+      </div>
+      <div>
+        <div class="sumcard"><div class="sh">Program health</div><div class="sb">
+          <div class="kv"><span class="k">Properties reporting</span><span class="v">11 of 11</span></div>
+          <div class="kv"><span class="k">Open action items</span><span class="v">147</span></div>
+          <div class="kv"><span class="k">Overdue</span><span class="v" style="color:var(--alert)">14</span></div>
+          <div class="kv"><span class="k">Growth requests open</span><span class="v">9</span></div>
+          <div class="kv"><span class="k">Acknowledged in SLA</span><span class="v" style="color:var(--warn)">78%</span></div>
+          <div class="kv"><span class="k">Declined with written reason</span><span class="v" style="color:var(--ok)">100%</span></div>
+        </div></div>
+        <div class="sumcard" style="border-left:3px solid var(--grw);">
+          <div class="sh" style="color:var(--grw)">The metric that matters</div>
+          <div class="sb"><div class="fldhint" style="margin:0">Not how many growth requests are approved — how many get a <b>straight answer</b>. A declined request answered in three days with a written reason is a healthier signal than an approved one that took six weeks. Silence is the only real failure, which is why the SLA escalates rather than the approval rate being targeted.</div></div>
+        </div>
+        <div class="sumcard"><div class="sh">Escalation rules in force</div><div class="sb">
+          <div class="itemlist">
+            <div class="iitem"><span class="ib">1</span><div style="flex:1"><div class="it">No acknowledgment in 5 business days</div><div class="imeta"><span>→ notifies the next level up</span></div></div></div>
+            <div class="iitem"><span class="ib">2</span><div style="flex:1"><div class="it">No decision in 30 days</div><div class="imeta"><span>→ appears on this HR queue</span></div></div></div>
+            <div class="iitem"><span class="ib">3</span><div style="flex:1"><div class="it">Decline attempted with no reason</div><div class="imeta"><span>→ blocked at the API, not the UI</span></div></div></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODE 4 · GROWTH REQUEST LIFECYCLE
+     ================================================================ -->
+<section class="mode" id="m4">
+  <div class="mode-note">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+    Employee-initiated. The employee owns the record; the supervisor owes a response. Switch the responder view to see the control that makes a decline expensive enough to be honest.
+  </div>
+  <div class="centerwrap">
+    <div class="panelcard" style="margin-bottom:14px;">
+      <div class="pchead"><span class="t">Growth request · Assistant Manager track</span><span class="sub">GR-2026-0147</span>
+        <span style="margin-left:auto;display:flex;gap:5px;">
+          <button class="btn sm" id="gvA" onclick="setGV('emp')">As Courtney</button>
+          <button class="btn sm pri" id="gvB" onclick="setGV('sup')">As Maria · responder</button>
+        </span></div>
+      <div class="pcbody" style="border-bottom:1px solid var(--line)">
+        <div class="strack" id="grwTrack" style="justify-content:center"></div>
+      </div>
+
+      <div class="secdiv">The request</div>
+      <div class="pcbody">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:11px;">
+          <span class="tag grw">Career path</span>
+          <span class="tag mute">Raised Jun 4, 2026</span>
+          <span class="tag mute">Routed to Maria Gonzales</span>
+          <span class="sla ok">Acknowledged in 2 days</span>
+        </div>
+        <div class="roblock">I want to understand what the path to Assistant Manager actually looks like here, and what I would need to demonstrate to be considered. I have been at Riverbend three years. I am not asking for a promotion today — I am asking for a target I can work toward and honest feedback on the gap. If the answer is that there is no path at Riverbend, I would rather know that than keep guessing.</div>
+        <div class="fldhint">Raised by Courtney Murrah. The employee's own words are the record — the supervisor cannot edit this text.</div>
+      </div>
+
+      <div class="secdiv">Response</div>
+      <div id="grwResp"></div>
+    </div>
+
+    <div class="dnote" style="margin:0;">
+      <div class="dh">Two controls this screen implements deliberately</div>
+      <ul>
+        <li><b>Decline requires a written reason.</b> The button is disabled with an empty reason field, and the API rejects the transition regardless of what the client sends. This is the "own your work, sign your name to it" value made structural — a supervisor may say no, but not anonymously and not without saying why.</li>
+        <li><b>Acknowledgment is separate from decision.</b> Acknowledging within 5 business days costs nothing and buys the employee the knowledge that they were heard. Deciding can legitimately take longer. Conflating the two is what turns this feature into a black hole.</li>
+      </ul>
+      Third question still open, and it is the one that most needs HR: <b>can an employee route a growth request past their supervisor, directly to HR?</b> This prototype does not allow it. That is a defensible default and a bad answer in the specific case where the supervisor is the obstacle.
+    </div>
+  </div>
+</section>
+
+<!-- ================= RAISE GROWTH REQUEST DIALOG ================= -->
+<div class="overlay" id="ovGrw">
+  <div class="dialog">
+    <h3>Raise a growth request</h3>
+    <p class="dsub">This goes on your permanent record and is visible to your supervisor, the chain above them, and HR. Your supervisor owes you an acknowledgment within 5 business days.</p>
+    <div style="margin-top:16px">
+      <div class="fld"><label>Type</label>
+        <select><option>Career path</option><option>Training or certification</option><option>New skill or responsibility</option><option>Mentorship</option><option>Role change</option><option>Other</option></select></div>
+      <div class="fld"><label>What are you asking for <span class="reqmark">*</span></label>
+        <textarea id="grwText" placeholder="Your words go on the record unedited. Be specific about what you want and what you are willing to do for it."></textarea>
+        <div class="fldhint">Neither your supervisor nor HR can alter this text. They can only respond to it.</div></div>
+      <div class="fld" style="margin:0"><label>Route to</label>
+        <select><option>Maria Gonzales — my supervisor (default)</option><option disabled>Barry Slaymaker — Area Manager (not enabled)</option><option disabled>Human Resources directly (not enabled)</option></select>
+        <div class="fldhint">Alternate routing is an open policy question and is disabled in this prototype.</div></div>
+    </div>
+    <div class="dacts">
+      <button class="btn ghost" onclick="closeGrw()">Cancel</button>
+      <button class="btn pri" onclick="submitGrw()">Submit request</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const SRC={
+  oto :['One-on-one','oto'],
+  ppm :['PPM goal','ppm'],
+  cva :['CVA follow-up','cva'],
+  grw :['Growth request','grw'],
+  std :['Standalone','mute']
+};
+
+const MINE=[
+  {t:'Submit September market survey', src:'std', from:'Maria Gonzales', due:'Sep 4, 2026', st:'over', note:'Overdue 4 days'},
+  {t:'Draft the Q4 renewal campaign timeline and send to Maria', src:'oto', from:'One-on-one · Sep 2, 2026', due:'Sep 19, 2026', st:'soon'},
+  {t:'Own the Q4 renewal campaign end to end', src:'ppm', from:'PPM · Aug 2026 · Section 2 Focus', due:'Dec 15, 2026', st:'open'},
+  {t:'Build a shadowing rotation with maintenance', src:'ppm', from:'PPM · Aug 2026 · Section 2 Partnership', due:'Nov 1, 2026', st:'open'},
+  {t:'Complete NAA Fair Housing course', src:'grw', from:'Growth request · Jan 2026', due:'Mar 31, 2026', st:'done'},
+  {t:'Shadow two renewal conversations', src:'oto', from:'One-on-one · Oct 2025', due:'Nov 30, 2025', st:'done'},
+  {t:'Set up the Monday deadline-risk status note', src:'oto', from:'One-on-one · May 2026', due:'May 25, 2026', st:'done'},
+  {t:'Close out CVA 2025 follow-up on objection handling', src:'cva', from:'CVA 2025', due:'Jan 31, 2026', st:'done'}
+];
+
+const TEAM=[
+  {n:'Courtney Murrah', t:'Submit September market survey', src:'std', due:'Sep 4', st:'over', own:'emp'},
+  {n:'Ray Bourgeois',   t:'Complete EPA 608 recertification', src:'grw', due:'Aug 29', st:'over', own:'emp'},
+  {n:'Alicia Reyes',    t:'Take over weekly delinquency review', src:'ppm', due:'Sep 1', st:'over', own:'emp'},
+  {n:'Courtney Murrah', t:'Draft Q4 renewal campaign timeline', src:'oto', due:'Sep 19', st:'soon', own:'emp'},
+  {n:'Devon Pruitt',    t:'Shadow Alicia on two move-out inspections', src:'oto', due:'Sep 25', st:'soon', own:'emp'},
+  {n:'Courtney Murrah', t:'Write the Assistant Manager development outline', src:'oto', due:'Sep 30', st:'soon', own:'sup'},
+  {n:'Ray Bourgeois',   t:'Get Ray onto the after-hours rotation fairly', src:'oto', due:'Oct 3', st:'open', own:'sup'},
+  {n:'Alicia Reyes',    t:'Sit in on one of Alicia\u2019s one-on-ones as coaching', src:'oto', due:'Oct 10', st:'open', own:'sup'},
+  {n:'Courtney Murrah', t:'Own the Q4 renewal campaign end to end', src:'ppm', due:'Dec 15', st:'open', own:'emp'},
+  {n:'Nate Okafor',     t:'Cross-train on irrigation controller', src:'ppm', due:'Nov 20', st:'open', own:'emp'},
+  {n:'Tasha Bell',      t:'Document the make-ready checklist changes', src:'cva', due:'Oct 31', st:'open', own:'emp'}
+];
+
+const GRW_SUP=[
+  {n:'Courtney Murrah', t:'Assistant Manager track', raised:'Jun 4', ack:'2 days', st:['In progress','warn'], sla:'ok'},
+  {n:'Ray Bourgeois',   t:'EPA 608 recertification', raised:'Jul 22', ack:'1 day', st:['Approved','ok'], sla:'ok'},
+  {n:'Devon Pruitt',    t:'Move to a maintenance role', raised:'Sep 2', ack:'—', st:['Submitted','mute'], sla:'warn'}
+];
+
+const HR_GRW=[
+  {n:'Devon Pruitt',  p:'Riverbend',    mgr:'Maria Gonzales', t:'Move to a maintenance role', raised:'Sep 2', st:['Submitted','mute'], sla:['warn','2 days left']},
+  {n:'Luis Ferrer',   p:'Stonebridge',  mgr:'Kevin Marsh',    t:'Yardi reporting training', raised:'Aug 18', st:['Submitted','mute'], sla:['breach','SLA breached · 9 days']},
+  {n:'Renata Cole',   p:'Stonebridge',  mgr:'Kevin Marsh',    t:'Assistant Manager track', raised:'Jul 30', st:['Submitted','mute'], sla:['breach','SLA breached · 22 days']},
+  {n:'Courtney Murrah',p:'Riverbend',   mgr:'Maria Gonzales', t:'Assistant Manager track', raised:'Jun 4', st:['In progress','warn'], sla:['warn','96 days to decision']},
+  {n:'Priya Raman',   p:'Laurel Point', mgr:'Barry Slaymaker',t:'Regional operations exposure', raised:'Aug 28', st:['Acknowledged','ok'], sla:['ok','on track']},
+  {n:'Marcus Webb',   p:'Cypress Walk', mgr:'Dana Whitfield', t:'Certified Apartment Manager', raised:'Aug 12', st:['Declined','alert'], sla:['ok','reason on record']}
+];
+
+const HR_OVER=[
+  {n:'Ray Bourgeois',  p:'Stonebridge',  t:'Complete EPA 608 recertification', src:'grw', days:10},
+  {n:'Alicia Reyes',   p:'Riverbend',    t:'Take over weekly delinquency review', src:'ppm', days:7},
+  {n:'Courtney Murrah',p:'Riverbend',    t:'Submit September market survey', src:'std', days:4},
+  {n:'Kevin Marsh',    p:'Stonebridge',  t:'Write development outline for Renata Cole', src:'grw', days:22, sup:true},
+  {n:'Kevin Marsh',    p:'Stonebridge',  t:'Respond to Luis Ferrer training request', src:'grw', days:9, sup:true}
+];
+
+const HR_GATE=[
+  {p:'Cypress Walk', mgr:'Dana Whitfield', n:2, why:'PPM in flight — HR visibility begins at Complete'},
+  {p:'Laurel Point', mgr:'Priya Raman',    n:1, why:'PPM in flight — HR visibility begins at Complete'},
+  {p:'Riverbend',    mgr:'Maria Gonzales', n:1, why:'One-on-one still in draft — not shared with the employee'}
+];
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const srcTag=k=>`<span class="tag ${SRC[k][1]}">${SRC[k][0]}</span>`;
+const stTag={over:['Overdue','alert'],soon:['Due soon','warn'],open:['Open','mute'],done:['Complete','ok']};
+
+/* ============================================================
+   MODE 1 · MINE
+   ============================================================ */
+function renderMine(){
+  const groups=[
+    ['Needs attention', MINE.filter(x=>x.st==='over'), 'alert'],
+    ['Due in the next 30 days', MINE.filter(x=>x.st==='soon'), 'warn'],
+    ['Open', MINE.filter(x=>x.st==='open'), 'mute'],
+    ['Closed this cycle', MINE.filter(x=>x.st==='done'), 'ok']
+  ];
+  let h='';
+  groups.forEach(([title,rows,tone])=>{
+    if(!rows.length) return;
+    h+=`<div class="panelcard" style="margin-bottom:14px;">
+      <div class="pchead"><span class="t">${title}</span><span class="sub">${rows.length}</span>
+      ${tone==='alert'?'<span style="margin-left:auto"><span class="tag alert">Action required</span></span>':''}</div>
+      <div class="pcbody"><div class="itemlist">`;
+    rows.forEach(r=>{
+      h+=`<div class="iitem ${r.st==='done'?'done':''}" style="${r.st==='over'?'border-color:var(--alert)':''}">
+        <span class="ib" onclick="toast('${r.st==='done'?'Would reopen':'Would close'} — closure requires a note')">${r.st==='done'?'✓':''}</span>
+        <div style="flex:1">
+          <div class="it">${esc(r.t)}</div>
+          <div class="imeta">${srcTag(r.src)}<span>${esc(r.from)}</span><span style="${r.st==='over'?'color:var(--alert);font-weight:800':''}">${r.note||'Due '+r.due}</span></div>
+        </div>
+        ${r.st!=='done'?'<button class="btn sm ghost" onclick="toast(\'Would open the closure note\')">Update</button>':''}
+      </div>`;
+    });
+    h+=`</div></div></div>`;
+  });
+  document.getElementById('mineCol').innerHTML=h;
+}
+
+/* ============================================================
+   MODE 2 · MY TEAM
+   ============================================================ */
+let TFILT='all';
+function renderTeam(){
+  const rows = TFILT==='all'?TEAM : TFILT==='mine'?TEAM.filter(r=>r.own==='sup') : TEAM.filter(r=>r.st==='over');
+  document.getElementById('teamCount').textContent=`${rows.length} shown of ${TEAM.length}`;
+  document.getElementById('teamFilt').innerHTML=[['all','All'],['over','Overdue'],['mine','Owned by me']]
+    .map(([k,l])=>`<button class="btn sm ${TFILT===k?'pri':''}" onclick="setTF('${k}')">${l}</button>`).join('');
+  document.getElementById('teamTbl').innerHTML=
+    `<thead><tr><th>Owner</th><th>Item</th><th>Source</th><th>Due</th><th>Status</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr class="clickable" onclick="toast('Would open the item')">
+      <td class="nm">${r.own==='sup'?'<span style="color:var(--warn)">You</span>':esc(r.n)}<div class="sub">${r.own==='sup'?'re: '+esc(r.n):''}</div></td>
+      <td>${esc(r.t)}</td><td>${srcTag(r.src)}</td><td>${r.due}</td>
+      <td><span class="tag ${stTag[r.st][1]}">${stTag[r.st][0]}</span></td></tr>`).join('')+`</tbody>`;
+
+  document.getElementById('grwTbl').innerHTML=
+    `<thead><tr><th>Employee</th><th>Request</th><th>Raised</th><th>Acknowledged</th><th>Status</th></tr></thead><tbody>`+
+    GRW_SUP.map(g=>`<tr class="clickable" onclick="setMode(4)">
+      <td class="nm">${esc(g.n)}</td><td>${esc(g.t)}</td><td>${g.raised}</td>
+      <td>${g.ack==='—'?`<span class="sla warn">2 days left</span>`:`<span class="sla ok">${g.ack}</span>`}</td>
+      <td><span class="tag ${g.st[1]}">${g.st[0]}</span></td></tr>`).join('')+`</tbody>`;
+}
+function setTF(k){ TFILT=k; renderTeam(); }
+
+/* ============================================================
+   MODE 3 · HR
+   ============================================================ */
+function renderHR(){
+  document.getElementById('hrGrwTbl').innerHTML=
+    `<thead><tr><th>Employee</th><th>Property</th><th>Responder</th><th>Request</th><th>Raised</th><th>Status</th><th>SLA</th></tr></thead><tbody>`+
+    HR_GRW.map(g=>`<tr class="clickable" onclick="toast('Would open ${esc(g.n)}\\'s request')">
+      <td class="nm">${esc(g.n)}</td><td>${g.p}</td><td>${esc(g.mgr)}</td><td>${esc(g.t)}</td><td>${g.raised}</td>
+      <td><span class="tag ${g.st[1]}">${g.st[0]}</span></td>
+      <td><span class="sla ${g.sla[0]}">${g.sla[1]}</span></td></tr>`).join('')+`</tbody>`;
+
+  document.getElementById('hrOverTbl').innerHTML=
+    `<thead><tr><th>Owner</th><th>Property</th><th>Item</th><th>Source</th><th>Days over</th></tr></thead><tbody>`+
+    HR_OVER.map(o=>`<tr class="clickable" onclick="toast('Would open the item')">
+      <td class="nm">${esc(o.n)}${o.sup?'<div class="sub" style="color:var(--warn)">supervisor-owned</div>':''}</td>
+      <td>${o.p}</td><td>${esc(o.t)}</td><td>${srcTag(o.src)}</td>
+      <td style="font-weight:800;color:${o.days>14?'var(--alert)':'var(--warn)'}">${o.days}</td></tr>`).join('')+`</tbody>`;
+
+  document.getElementById('hrGateTbl').innerHTML=
+    `<thead><tr><th>Property</th><th>Supervisor</th><th>Items withheld</th><th>Reason</th></tr></thead><tbody>`+
+    HR_GATE.map(g=>`<tr class="locked">
+      <td class="nm">${g.p}</td><td>${esc(g.mgr)}</td>
+      <td><span class="tag mute">${g.n} withheld</span></td>
+      <td style="font-size:11.5px;color:var(--ink-3)">${esc(g.why)}</td></tr>`).join('')+
+    `</tbody>`;
+}
+
+/* ============================================================
+   MODE 4 · GROWTH REQUEST
+   ============================================================ */
+const GSTAGES=['Submitted','Acknowledged','In progress','Decision'];
+let GV='sup', GIDX=2, DECLINE=false;
+
+function renderGrw(){
+  document.getElementById('grwTrack').innerHTML=
+    GSTAGES.map((s,i)=>`<div class="sstep ${i<GIDX?'done':i===GIDX?'now':''}"><div class="dot"></div><div class="tl">${s}</div></div>`).join('');
+  document.getElementById('gvA').className='btn sm '+(GV==='emp'?'pri':'');
+  document.getElementById('gvB').className='btn sm '+(GV==='sup'?'pri':'');
+
+  const box=document.getElementById('grwResp');
+  if(GV==='emp'){
+    box.innerHTML=`<div class="pcbody">
+      <div class="roblock"><b>Acknowledged Jun 6, 2026 by Maria Gonzales.</b><br><br>Received — I want to give you a real answer rather than a fast one. Give me until the end of the month to talk to Barry about what openings are realistic across the area.</div>
+      <div style="margin-top:12px" class="roblock"><b>Update Sep 2, 2026 · from the one-on-one.</b><br><br>There is no Assistant Manager opening at Riverbend right now and I am not going to pretend otherwise. What I owe you is a written outline of what the role requires and where you currently sit against it, by Sep 30. Barry is looking at area-wide openings.</div>
+      <div class="fldhint" style="margin-top:11px">You will be notified when a decision is recorded. This request stays open on your record and on Maria's until it is decided — it does not expire.</div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn ghost" onclick="toast('Would add a comment to the request')">Add a comment</button>
+        <button class="btn ghost" onclick="toast('Would withdraw — request is retired, not deleted')">Withdraw request</button>
+      </div></div>`;
+    return;
+  }
+  box.innerHTML=`<div class="pcbody">
+    <div class="roblock" style="margin-bottom:14px"><b>Your acknowledgment · Jun 6, 2026 (2 days).</b> Recorded. The 5-business-day SLA was met.</div>
+    <div class="fld"><label>Decision</label>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;">
+        <button class="btn sm ${!DECLINE?'pri':''}" onclick="setDecline(false)">Approve / support</button>
+        <button class="btn sm ${DECLINE?'danger':''}" onclick="setDecline(true)">Decline</button>
+        <button class="btn sm" onclick="toast('Would defer with a review date — still requires a reason')">Defer</button>
+      </div></div>
+    <div class="fld"><label>${DECLINE?'Reason for declining <span class="reqmark">*</span>':'Response to the employee <span class="reqmark">*</span>'}</label>
+      <textarea id="respText" oninput="checkResp()" placeholder="${DECLINE?'Required. This text is shown to the employee verbatim and is permanent. A decline cannot be recorded without it.':'What you are approving, what happens next, and by when.'}"></textarea>
+      <div class="fldhint">${DECLINE
+        ? 'The API rejects a Declined transition with an empty reason regardless of what the client sends. This is enforced server-side, not in the browser.'
+        : 'Approval should name a concrete next step — an approval with no action item behind it reads as a deferral to the employee.'}</div></div>
+    ${!DECLINE?`<div class="fld"><label>Create a linked action item</label>
+      <div class="itemadd" style="margin:0"><input value="Write the Assistant Manager development outline"><input class="due" type="date" value="2026-09-30"></div>
+      <div class="fldhint">Owner defaults to you, not the employee. An approved growth request that creates work only for the employee is not support.</div></div>`:''}
+    <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+      <button class="btn ${DECLINE?'danger':'pri'}" id="respBtn" disabled onclick="recordDecision()">${DECLINE?'Record decline':'Record approval'}</button>
+      <span class="fldhint" id="respHint" style="margin:0">${DECLINE?'Disabled until a reason is written.':'Disabled until a response is written.'}</span>
+    </div></div>`;
+  checkResp();
+}
+function setDecline(v){ DECLINE=v; renderGrw(); }
+function checkResp(){
+  const t=document.getElementById('respText'); if(!t) return;
+  const ok=t.value.trim().length>=12;
+  const b=document.getElementById('respBtn'); b.disabled=!ok;
+  document.getElementById('respHint').textContent = ok
+    ? 'This response is permanent and shown to the employee verbatim.'
+    : (DECLINE?'Disabled until a reason is written.':'Disabled until a response is written.');
+}
+function recordDecision(){ GIDX=3; toast(DECLINE?'Decline recorded with reason — visible to the employee, chain and HR':'Approval recorded — linked action item created'); renderGrw(); }
+function setGV(v){ GV=v; renderGrw(); }
+
+/* ============================================================
+   DIALOG · RAISE
+   ============================================================ */
+function openGrw(){ document.getElementById('ovGrw').classList.add('on'); }
+function closeGrw(){ document.getElementById('ovGrw').classList.remove('on'); }
+function submitGrw(){
+  const t=document.getElementById('grwText').value.trim();
+  if(t.length<12){ toast('Describe what you are asking for before submitting'); return; }
+  closeGrw(); toast('Submitted — Maria owes an acknowledgment within 5 business days');
+}
+document.getElementById('ovGrw').addEventListener('click',e=>{ if(e.target.id==='ovGrw') closeGrw(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeGrw(); });
+
+/* ============================================================
+   CHROME
+   ============================================================ */
+const MODEDESC={
+  1:'<b>Mine.</b> Every open commitment, whatever created it. Growth requests are raised from here.',
+  2:'<b>My Team.</b> Items owed by the team and by you. Growth requests routed to you carry an acknowledgment clock.',
+  3:'<b>HR Operations.</b> Org-wide roll-up. Source-gated items appear as counts, never content.',
+  4:'<b>Growth request lifecycle.</b> Submitted → Acknowledged → In progress → Decision, with a written reason required to decline.'
+};
+const HEADS={
+  1:['CM','Courtney Murrah','Leasing Consultant · Riverbend'],
+  2:['MG','Maria Gonzales','Property Manager · Riverbend · 6 direct reports'],
+  3:['MJ','Meg Johnson','Human Resources · 11 properties'],
+  4:['CM','Courtney Murrah','Growth request GR-2026-0147 · raised Jun 4, 2026']
+};
+const HEADACTS={
+  1:'<button class="btn pri" onclick="openGrw()">Raise a growth request</button>',
+  2:'<button class="btn pri" onclick="toast(\'Would open the assign-item sheet\')">Assign an item</button>',
+  3:'<button class="btn ghost" onclick="toast(\'Would export the program report\')">Export report</button>',
+  4:'<button class="btn ghost" onclick="toast(\'Would show the full request history\')">History</button>'
+};
+function setMode(m){
+  document.querySelectorAll('#modeTabs button').forEach(b=>b.classList.toggle('on',+b.dataset.m===m));
+  document.querySelectorAll('.mode').forEach(s=>s.classList.toggle('on',s.id==='m'+m));
+  document.getElementById('modeDesc').innerHTML=MODEDESC[m];
+  document.getElementById('hAv').textContent=HEADS[m][0];
+  document.getElementById('hName').textContent=HEADS[m][1];
+  document.getElementById('hTitle').textContent=HEADS[m][2];
+  document.getElementById('headActs').innerHTML=HEADACTS[m];
+}
+document.getElementById('modeTabs').addEventListener('click',e=>{const b=e.target.closest('button'); if(b) setMode(+b.dataset.m);});
+
+let tt; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* init */
+renderMine(); renderTeam(); renderHR(); renderGrw(); setMode(1);
+</script>
+</body>
+</html>
